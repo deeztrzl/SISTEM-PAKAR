@@ -382,17 +382,19 @@
                                     ${diag.name} (${diag.code})
                                     <span class="float-end">
                                         <i class="fas fa-chart-bar me-1"></i>
-                                        ${diag.confidence_percentage}%
+                                        <span class="confidence-text" data-target="${diag.confidence_percentage}">0</span>%
                                     </span>
                                 </h6>
                             </div>
                             <div class="card-body">
                                 <p class="card-text"><strong>Deskripsi:</strong> ${diag.description}</p>
                                 <p class="card-text"><strong>Solusi:</strong> ${diag.solution}</p>
-                                <div class="progress mb-2">
-                                    <div class="progress-bar bg-${confidenceColor}" style="width: ${diag.confidence_percentage}%"></div>
+                                <div class="progress mb-2" style="height: 8px;">
+                                    <div class="progress-bar bg-${confidenceColor} animated-progress" 
+                                         data-target="${diag.confidence_percentage}" 
+                                         style="width: 0%; transition: width 2s ease-in-out;"></div>
                                 </div>
-                                <small class="text-muted">Tingkat Kepercayaan: ${diag.confidence_percentage}%</small>
+                                <small class="text-muted">Tingkat Kepercayaan: <span class="confidence-small" data-target="${diag.confidence_percentage}">0</span>%</small>
                             </div>
                         </div>
                     `;
@@ -439,7 +441,55 @@
             }
 
             document.getElementById('resultsContent').innerHTML = html;
-            new bootstrap.Modal(document.getElementById('resultsModal')).show();
+            const modal = new bootstrap.Modal(document.getElementById('resultsModal'));
+            modal.show();
+            
+            // Start progress bar animations after modal is shown
+            setTimeout(() => {
+                animateProgressBars();
+            }, 300); // Small delay to ensure modal is fully visible
+        }
+
+        function animateProgressBars() {
+            // Animate progress bars
+            document.querySelectorAll('.animated-progress').forEach((progressBar, index) => {
+                const targetValue = parseFloat(progressBar.getAttribute('data-target'));
+                
+                // Add staggered animation for multiple results
+                setTimeout(() => {
+                    progressBar.style.width = targetValue + '%';
+                }, index * 200); // 200ms delay between each animation
+            });
+
+            // Animate confidence text numbers
+            document.querySelectorAll('.confidence-text, .confidence-small').forEach((textElement, index) => {
+                const targetValue = parseFloat(textElement.getAttribute('data-target'));
+                
+                setTimeout(() => {
+                    animateNumber(textElement, 0, targetValue, 2000); // 2 second duration
+                }, index * 200);
+            });
+        }
+
+        function animateNumber(element, start, end, duration) {
+            const startTime = performance.now();
+            
+            function updateNumber(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Easing function (ease-out)
+                const easedProgress = 1 - Math.pow(1 - progress, 3);
+                
+                const currentValue = Math.round(start + (end - start) * easedProgress);
+                element.textContent = currentValue;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(updateNumber);
+                }
+            }
+            
+            requestAnimationFrame(updateNumber);
         }
 
         // Quick select functions (removed - keeping only updateSelectedCount)

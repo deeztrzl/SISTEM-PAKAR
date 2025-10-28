@@ -44,32 +44,9 @@ motorcycle_expert_system/
 ├── templates/
 │   └── index.html                  # Main page dengan accordion
 ├── requirements.txt                # Python dependencies
-├── INSTALL.md                      # Panduan instalasi
-├── LAPORAN.md                      # Laporan lengkap pengembangan
 └── README.md                       # Dokumentasi project
 ```
-```
-motorcycle_expert_system/
-├── app.py                    # Flask web application
-├── rules.json               # Knowledge base rules
-├── symptoms.json            # Daftar gejala
-├── symptoms_categorized.json # Gejala dalam kategori
-├── damages.json             # Daftar kerusakan
-├── inference_engine/
-│   └── engine.py            # Forward chaining engine
-├── templates/
-│   └── index.html           # Main UI with accordion
-├── test_system.py           # Test suite
-├── README.md               # Dokumentasi
-├── INSTALL.md              # Panduan instalasi
-├── LAPORAN.md              # Laporan pengembangan
-└── requirements.txt        # Dependencies
-```
 
-## Testing
-```bash
-python test_system.py
-```
 
 ## Pengembang
 Berdasarkan jurnal: "Development of a Mobile Expert System for the Diagnosis on Motorcycle Damage Using Forward Chaining Algorithm"

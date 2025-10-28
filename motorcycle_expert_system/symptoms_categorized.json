@@ -1,0 +1,89 @@
+{
+  "kategori": {
+    "Sistem Starter & Kelistrikan": {
+      "icon": "fas fa-bolt",
+      "color": "primary",
+      "symptoms": {
+        "K01": "Motor tidak mau hidup sama sekali",
+        "K02": "Starter tidak berfungsi",
+        "K03": "Lampu indikator tidak menyala",
+        "K04": "Klakson tidak bunyi",
+        "K29": "Lampu depan redup",
+        "K30": "Lampu sein tidak berkedip",
+        "K31": "Speedometer tidak akurat",
+        "K32": "Baterai cepat tekor"
+      }
+    },
+    "Performa Mesin": {
+      "icon": "fas fa-car",
+      "color": "danger",
+      "symptoms": {
+        "K05": "Motor susah hidup/starter berulang kali",
+        "K06": "Mesin hidup sebentar lalu mati",
+        "K07": "Putaran mesin tidak stabil/brebet",
+        "K08": "Tenaga motor berkurang",
+        "K09": "Konsumsi bahan bakar boros",
+        "K17": "Motor tidak bisa mencapai kecepatan maksimal",
+        "K20": "Motor tersendat saat akselerasi",
+        "K34": "Getaran berlebihan saat idle"
+      }
+    },
+    "Asap & Emisi": {
+      "icon": "fas fa-smog",
+      "color": "warning",
+      "symptoms": {
+        "K10": "Asap knalpot hitam pekat",
+        "K11": "Asap knalpot putih tebal",
+        "K12": "Asap knalpot biru"
+      }
+    },
+    "Suara & Getaran": {
+      "icon": "fas fa-volume-up",
+      "color": "info",
+      "symptoms": {
+        "K13": "Suara mesin kasar/berisik",
+        "K19": "Suara berdecit dari CVT",
+        "K23": "Rem berbunyi mencicit",
+        "K33": "Suara abnormal dari roda"
+      }
+    },
+    "Sistem Pendinginan & Pelumasan": {
+      "icon": "fas fa-thermometer-half",
+      "color": "success",
+      "symptoms": {
+        "K14": "Mesin overheat/panas berlebihan",
+        "K15": "Air radiator cepat habis",
+        "K16": "Oli mesin cepat habis"
+      }
+    },
+    "Transmisi CVT": {
+      "icon": "fas fa-cogs",
+      "color": "secondary",
+      "symptoms": {
+        "K18": "Perpindahan gigi CVT tidak halus",
+        "K19": "Suara berdecit dari CVT"
+      }
+    },
+    "Sistem Rem": {
+      "icon": "fas fa-hand-paper",
+      "color": "dark",
+      "symptoms": {
+        "K21": "Rem depan tidak pakem",
+        "K22": "Rem belakang tidak pakem",
+        "K23": "Rem berbunyi mencicit",
+        "K24": "Handle rem terasa spons"
+      }
+    },
+    "Handling & Kemudi": {
+      "icon": "fas fa-motorcycle",
+      "color": "primary",
+      "symptoms": {
+        "K25": "Setang bergoyang saat berjalan",
+        "K26": "Motor susah dibelokkan",
+        "K27": "Ban depan aus tidak merata",
+        "K28": "Ban belakang aus tidak merata",
+        "K33": "Suara abnormal dari roda"
+      }
+    }
+  }
+}

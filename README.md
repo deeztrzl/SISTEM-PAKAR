@@ -1,4 +1,5 @@
 # Sistem Pakar Diagnosa Kerusakan Sepeda Motor Matic
+[Link Vercel](https://sistem-pakar-j9qb.vercel.app/)
 
 ## Deskripsi
 Web App Sistem Pakar untuk mendiagnosa kerusakan sepeda motor matic menggunakan metode Forward Chaining dengan Certainty Factor (CF).

@@ -1,3 +1,7 @@
+// GANTI 'nama-library-lu' dengan nama persis yang lu isi di kolom Name pada konfigurasi Shared Library Jenkins.
+// CATATAN: Hapus baris ini JIKA lu sudah mencentang opsi "Load implicitly".
+@Library('my-local-lib') _
+
 pipeline {
     agent any
     
@@ -34,6 +38,9 @@ pipeline {
                         pip install --upgrade pip setuptools wheel
                         pip install -r requirements.txt
                         pip install pytest pytest-cov pylint black flake8
+                        
+                        # FAKTA: Folder reports wajib dibuat di sini sebelum linting atau test berjalan
+                        mkdir -p reports
                     '''
                 }
             }
@@ -47,8 +54,8 @@ pipeline {
                             echo "🔍 Running code style checks..."
                             sh '''
                                 . ${VENV_DIR}/bin/activate
-                                pylint **/*.py --disable=R,C --exit-zero > reports/lint-report.txt || true
-                                flake8 --format=json > reports/flake8-report.json || true
+                                pylint **/*.py --disable=R,C --exit-zero > reports/lint-report.txt
+                                flake8 --format=json > reports/flake8-report.json
                             '''
                         }
                     }
@@ -60,7 +67,7 @@ pipeline {
                             echo "✨ Checking code format..."
                             sh '''
                                 . ${VENV_DIR}/bin/activate
-                                black --check . || true
+                                black --check .
                             '''
                         }
                     }
@@ -74,13 +81,12 @@ pipeline {
                     echo "🧪 Running unit tests..."
                     sh '''
                         . ${VENV_DIR}/bin/activate
-                        mkdir -p reports
                         pytest tests/test_inference.py -v --tb=short \
                             --junitxml=reports/junit.xml \
                             --cov=inference_engine \
                             --cov-report=html:coverage-report \
                             --cov-report=xml:reports/coverage.xml \
-                            --cov-report=term-missing || true
+                            --cov-report=term-missing
                     '''
                 }
             }
@@ -93,7 +99,7 @@ pipeline {
                     sh '''
                         . ${VENV_DIR}/bin/activate
                         pytest tests/test_api.py -v --tb=short \
-                            --junitxml=reports/integration-tests.xml || true
+                            --junitxml=reports/integration-tests.xml
                     '''
                 }
             }
@@ -107,7 +113,7 @@ pipeline {
                         . ${VENV_DIR}/bin/activate
                         timeout 30 python simple_server.py &
                         sleep 5
-                        curl -f http://localhost:5000/api/status || exit 1
+                        curl -f http://localhost:5000/api/status
                     '''
                 }
             }
@@ -120,7 +126,7 @@ pipeline {
                     sh '''
                         . ${VENV_DIR}/bin/activate
                         pip install bandit
-                        bandit -r . -f json -o reports/bandit-report.json || true
+                        bandit -r . -f json -o reports/bandit-report.json
                     '''
                 }
             }
@@ -179,7 +185,7 @@ pipeline {
                     echo "⚡ Running performance tests..."
                     sh '''
                         . ${VENV_DIR}/bin/activate
-                        pytest tests/test_performance.py -v --tb=short || true
+                        pytest tests/test_performance.py -v --tb=short
                     '''
                 }
             }
@@ -188,7 +194,6 @@ pipeline {
         stage('Deploy Production') {
             when {
                 branch 'main'
-                tag "v*.*.*"
             }
             steps {
                 script {
@@ -207,24 +212,12 @@ pipeline {
         success {
             script {
                 echo "✅ Pipeline completed successfully!"
-                // Opsional: Kirim notifikasi
-                // emailext(
-                //     subject: "Build Success: ${APP_NAME}",
-                //     body: "The build ${BUILD_NUMBER} was successful.",
-                //     to: 'team@example.com'
-                // )
             }
         }
         
         failure {
             script {
                 echo "❌ Pipeline failed!"
-                // Opsional: Kirim notifikasi
-                // emailext(
-                //     subject: "Build Failed: ${APP_NAME}",
-                //     body: "The build ${BUILD_NUMBER} failed. Check logs: ${BUILD_URL}",
-                //     to: 'team@example.com'
-                // )
             }
         }
         

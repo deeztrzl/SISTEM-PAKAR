@@ -1,0 +1,107 @@
+[
+  {
+    "id": "R1",
+    "if": ["demam_tinggi", "sakit_kepala"],
+    "then": "suspek_infeksi",
+    "cf": 0.7,
+    "description": "Demam tinggi dan sakit kepala mengindikasikan suspek infeksi"
+  },
+  {
+    "id": "R2", 
+    "if": ["batuk_kering", "sesak_napas"],
+    "then": "suspek_infeksi_paru",
+    "cf": 0.8,
+    "description": "Batuk kering dan sesak napas mengindikasikan suspek infeksi paru"
+  },
+  {
+    "id": "R3",
+    "if": ["mual", "muntah", "diare"],
+    "then": "suspek_gastroenteritis",
+    "cf": 0.75,
+    "description": "Mual, muntah dan diare mengindikasikan suspek gastroenteritis"
+  },
+  {
+    "id": "R4",
+    "if": ["suspek_infeksi", "leukositosis"],
+    "then": "infeksi_bakteri",
+    "cf": 0.85,
+    "description": "Aturan sekuensial: Suspek infeksi dengan leukositosis mengarah ke infeksi bakteri"
+  },
+  {
+    "id": "R5",
+    "if": ["suspek_infeksi_paru", "infiltrat_paru"],
+    "then": "pneumonia",
+    "cf": 0.9,
+    "description": "Aturan sekuensial: Suspek infeksi paru dengan infiltrat mengarah ke pneumonia"
+  },
+  {
+    "id": "R6",
+    "if": ["demam_tinggi", "batuk_produktif", "nyeri_dada"],
+    "then": "pneumonia",
+    "cf": 0.8,
+    "description": "Aturan paralel: Gejala klasik pneumonia dengan CF berbeda"
+  },
+  {
+    "id": "R7",
+    "if": ["suspek_gastroenteritis", "dehidrasi"],
+    "then": "gastroenteritis_berat",
+    "cf": 0.8,
+    "description": "Aturan sekuensial: Suspek gastroenteritis dengan dehidrasi"
+  },
+  {
+    "id": "R8",
+    "if": ["infeksi_bakteri", "tidak_responsif_antibiotik"],
+    "then": "resistensi_antibiotik",
+    "cf": 0.7,
+    "description": "Aturan sekuensial: Infeksi bakteri yang tidak responsif mengarah ke resistensi"
+  },
+  {
+    "id": "R9",
+    "if": ["pneumonia", "gagal_napas"],
+    "then": "pneumonia_berat",
+    "cf": 0.9,
+    "description": "Aturan sekuensial: Pneumonia dengan gagal napas mengarah ke pneumonia berat"
+  },
+  {
+    "id": "R10",
+    "if": ["demam_tinggi", "ruam_kulit", "nyeri_sendi"],
+    "then": "infeksi_viral",
+    "cf": 0.6,
+    "description": "Gejala infeksi viral"
+  },
+  {
+    "id": "R11",
+    "if": ["suspek_infeksi", "limfositosis"],
+    "then": "infeksi_viral",
+    "cf": 0.7,
+    "description": "Aturan paralel: Suspek infeksi dengan limfositosis mengarah ke infeksi viral"
+  },
+  {
+    "id": "R12",
+    "if": ["gastroenteritis_berat", "syok_hipovolemik"],
+    "then": "komplikasi_serius",
+    "cf": 0.95,
+    "description": "Aturan sekuensial: Gastroenteritis berat dengan syok mengarah ke komplikasi serius"
+  },
+  {
+    "id": "R13",
+    "if": ["pneumonia_berat", "sepsis"],
+    "then": "komplikasi_serius",
+    "cf": 0.9,
+    "description": "Aturan paralel: Pneumonia berat dengan sepsis juga mengarah ke komplikasi serius"
+  },
+  {
+    "id": "R14",
+    "if": ["resistensi_antibiotik", "kultur_positif"],
+    "then": "terapi_khusus_diperlukan",
+    "cf": 0.85,
+    "description": "Aturan sekuensial: Resistensi antibiotik dengan kultur positif memerlukan terapi khusus"
+  },
+  {
+    "id": "R15",
+    "if": ["infeksi_viral", "komplikasi_sekunder"],
+    "then": "perawatan_intensif",
+    "cf": 0.8,
+    "description": "Aturan sekuensial: Infeksi viral dengan komplikasi memerlukan perawatan intensif"
+  }
+]

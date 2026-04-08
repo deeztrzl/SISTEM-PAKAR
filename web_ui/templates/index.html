@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+
+{% block title %}Beranda - Sistem Pakar Diagnosa Medis{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section bg-gradient text-white py-5 mb-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">
+                    <i class="fas fa-stethoscope me-3"></i>
+                    Sistem Pakar Diagnosa Medis
+                </h1>
+                <p class="lead mb-4">
+                    Sistem cerdas untuk membantu diagnosa medis menggunakan 
+                    <strong>Forward Chaining</strong> dengan <strong>Certainty Factor</strong>
+                </p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="{{ url_for('diagnosis_page') }}" class="btn btn-light btn-lg">
+                        <i class="fas fa-user-md me-2"></i>Mulai Diagnosa
+                    </a>
+                    <a href="{{ url_for('rules_page') }}" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-brain me-2"></i>Lihat Basis Pengetahuan
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <div class="medical-illustration">
+                    <i class="fas fa-heart-pulse" style="font-size: 200px; opacity: 0.3;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="container mb-5">
+    <div class="row text-center mb-5">
+        <div class="col-12">
+            <h2 class="display-6 fw-bold mb-3">Fitur Unggulan</h2>
+            <p class="lead text-muted">Teknologi terdepan untuk diagnosa medis yang akurat</p>
+        </div>
+    </div>
+    
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="feature-card h-100 text-center p-4">
+                <div class="feature-icon mb-3">
+                    <i class="fas fa-arrows-alt-h text-primary" style="font-size: 3rem;"></i>
+                </div>
+                <h4>Forward Chaining</h4>
+                <p class="text-muted">
+                    Algoritma inferensi yang memproses gejala secara bertahap 
+                    untuk mencapai kesimpulan diagnosa yang akurat.
+                </p>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="feature-card h-100 text-center p-4">
+                <div class="feature-icon mb-3">
+                    <i class="fas fa-percent text-success" style="font-size: 3rem;"></i>
+                </div>
+                <h4>Certainty Factor</h4>
+                <p class="text-muted">
+                    Menghitung tingkat keyakinan diagnosa berdasarkan 
+                    kekuatan gejala dan aturan medis yang terdefinisi.
+                </p>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="feature-card h-100 text-center p-4">
+                <div class="feature-icon mb-3">
+                    <i class="fas fa-sitemap text-warning" style="font-size: 3rem;"></i>
+                </div>
+                <h4>Aturan Kompleks</h4>
+                <p class="text-muted">
+                    Mendukung aturan sekuensial dan paralel untuk 
+                    menangani kasus medis yang kompleks dan beragam.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- How It Works Section -->
+<div class="bg-light py-5 mb-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="display-6 fw-bold mb-3">Cara Kerja Sistem</h2>
+                <p class="lead text-muted">Proses diagnosa dalam 4 langkah sederhana</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-3 text-center">
+                <div class="step-card">
+                    <div class="step-number mb-3">
+                        <span class="badge bg-primary rounded-circle p-3" style="font-size: 1.2rem;">1</span>
+                    </div>
+                    <h5>Input Gejala</h5>
+                    <p class="text-muted">Pilih gejala yang dialami pasien dan tentukan tingkat keyakinannya</p>
+                </div>
+            </div>
+            
+            <div class="col-md-3 text-center">
+                <div class="step-card">
+                    <div class="step-number mb-3">
+                        <span class="badge bg-success rounded-circle p-3" style="font-size: 1.2rem;">2</span>
+                    </div>
+                    <h5>Proses Inferensi</h5>
+                    <p class="text-muted">Sistem menjalankan forward chaining untuk menganalisis gejala</p>
+                </div>
+            </div>
+            
+            <div class="col-md-3 text-center">
+                <div class="step-card">
+                    <div class="step-number mb-3">
+                        <span class="badge bg-warning rounded-circle p-3" style="font-size: 1.2rem;">3</span>
+                    </div>
+                    <h5>Hitung CF</h5>
+                    <p class="text-muted">Menghitung certainty factor untuk setiap kemungkinan diagnosa</p>
+                </div>
+            </div>
+            
+            <div class="col-md-3 text-center">
+                <div class="step-card">
+                    <div class="step-number mb-3">
+                        <span class="badge bg-info rounded-circle p-3" style="font-size: 1.2rem;">4</span>
+                    </div>
+                    <h5>Hasil Diagnosa</h5>
+                    <p class="text-muted">Menampilkan diagnosa dengan tingkat keyakinan yang terukur</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Section -->
+<div class="container mb-5">
+    <div class="row text-center">
+        <div class="col-md-3">
+            <div class="stat-card p-3">
+                <h3 class="text-primary fw-bold" id="rules-count">15</h3>
+                <p class="text-muted mb-0">Aturan Medis</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card p-3">
+                <h3 class="text-success fw-bold" id="symptoms-count">21</h3>
+                <p class="text-muted mb-0">Gejala Tersedia</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card p-3">
+                <h3 class="text-warning fw-bold">7</h3>
+                <p class="text-muted mb-0">Domain Penyakit</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card p-3">
+                <h3 class="text-info fw-bold">98.5%</h3>
+                <p class="text-muted mb-0">Akurasi Inferensi</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Call to Action -->
+<div class="cta-section bg-primary text-white py-5">
+    <div class="container text-center">
+        <h2 class="display-6 fw-bold mb-3">Siap Memulai Diagnosa?</h2>
+        <p class="lead mb-4">
+            Gunakan sistem pakar kami untuk membantu proses diagnosa medis dengan teknologi AI terdepan
+        </p>
+        <a href="{{ url_for('diagnosis_page') }}" class="btn btn-light btn-lg">
+            <i class="fas fa-play me-2"></i>Mulai Sekarang
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Load statistics dari API
+    $(document).ready(function() {
+        // Load health check untuk mendapatkan statistik
+        $.get('/api/health')
+            .done(function(data) {
+                if (data.total_rules) {
+                    $('#rules-count').text(data.total_rules);
+                }
+                if (data.available_symptoms) {
+                    $('#symptoms-count').text(data.available_symptoms);
+                }
+            })
+            .fail(function() {
+                console.log('Failed to load statistics');
+            });
+    });
+</script>
+{% endblock %}

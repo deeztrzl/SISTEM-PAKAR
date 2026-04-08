@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Basis Pengetahuan - Sistem Pakar Medis{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="display-6 fw-bold">
+                <i class="fas fa-brain me-3"></i>
+                Basis Pengetahuan
+            </h2>
+            <p class="lead text-muted">
+                Aturan-aturan medis yang digunakan dalam sistem forward chaining
+            </p>
+        </div>
+    </div>
+    
+    <!-- Rules Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <h3 id="total-rules">0</h3>
+                    <p class="mb-0">Total Rules</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <h3 id="sequential-rules">0</h3>
+                    <p class="mb-0">Aturan Sekuensial</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body text-center">
+                    <h3 id="parallel-rules">0</h3>
+                    <p class="mb-0">Aturan Paralel</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                    <h3 id="avg-cf">0.0</h3>
+                    <p class="mb-0">Rata-rata CF</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filter and Search -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fas fa-search"></i>
+                </span>
+                <input type="text" id="rules-search" class="form-control" 
+                       placeholder="Cari aturan berdasarkan ID, premis, atau kesimpulan...">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <select id="cf-filter" class="form-select">
+                <option value="">Semua CF</option>
+                <option value="high">CF Tinggi (≥ 0.8)</option>
+                <option value="medium">CF Sedang (0.6 - 0.8)</option>
+                <option value="low">CF Rendah (< 0.6)</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select id="type-filter" class="form-select">
+                <option value="">Semua Jenis</option>
+                <option value="sequential">Aturan Sekuensial</option>
+                <option value="parallel">Aturan Paralel</option>
+                <option value="basic">Aturan Dasar</option>
+            </select>
+        </div>
+    </div>
+    
+    <!-- Rules Container -->
+    <div id="rules-container">
+        <!-- Loading -->
+        <div class="text-center py-5" id="rules-loading">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Memuat basis pengetahuan...</p>
+        </div>
+    </div>
+</div>
+
+<!-- Rule Detail Modal -->
+<div class="modal fade" id="ruleDetailModal" tabindex="-1" aria-labelledby="ruleDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ruleDetailModalLabel">
+                    <i class="fas fa-list-ul me-2"></i>
+                    Detail Aturan
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="rule-detail-content">
+                <!-- Rule detail content will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/rules.js') }}"></script>
+{% endblock %}

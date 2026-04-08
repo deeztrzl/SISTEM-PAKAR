@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+
+{% block title %}Tentang - Sistem Pakar Medis{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h2 class="display-5 fw-bold mb-3">
+                <i class="fas fa-info-circle me-3"></i>
+                Tentang Sistem Pakar
+            </h2>
+            <p class="lead text-muted">
+                Sistem pakar untuk diagnosa medis menggunakan forward chaining dengan certainty factor
+            </p>
+        </div>
+    </div>
+    
+    <!-- Project Info -->
+    <div class="row mb-5">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-project-diagram me-2"></i>
+                        Informasi Proyek
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <td><strong>Nama Proyek:</strong></td>
+                            <td>Sistem Pakar Diagnosa Medis</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tim:</strong></td>
+                            <td>SISPAK 2</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Versi:</strong></td>
+                            <td>2.0 (Web Edition)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tanggal:</strong></td>
+                            <td>Oktober 2025</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Teknologi:</strong></td>
+                            <td>
+                                <span class="badge bg-primary me-1">Python</span>
+                                <span class="badge bg-success me-1">Flask</span>
+                                <span class="badge bg-info me-1">Bootstrap</span>
+                                <span class="badge bg-warning text-dark">JavaScript</span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-cogs me-2"></i>
+                        Spesifikasi Teknis
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <td><strong>Algoritma:</strong></td>
+                            <td>Forward Chaining</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CF Method:</strong></td>
+                            <td>Certainty Factor</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Rules:</strong></td>
+                            <td>15 aturan medis</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Symptoms:</strong></td>
+                            <td>21 gejala medis</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Domain:</strong></td>
+                            <td>Infeksi, Pneumonia, Gastroenteritis</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Algorithm Explanation -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-brain me-2"></i>
+                        Penjelasan Algoritma
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Forward Chaining</h6>
+                            <p>
+                                Forward chaining adalah metode inferensi yang memulai dari fakta-fakta awal 
+                                (gejala) dan menggunakan aturan-aturan untuk mencapai kesimpulan (diagnosa).
+                            </p>
+                            <h6>Certainty Factor (CF)</h6>
+                            <p>
+                                CF digunakan untuk mengukur tingkat keyakinan terhadap suatu fakta atau aturan. 
+                                Nilai CF berkisar antara 0.0 (tidak yakin) hingga 1.0 (sangat yakin).
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Formula CF</h6>
+                            <div class="bg-light p-3 rounded">
+                                <p><strong>Aturan Sekuensial:</strong></p>
+                                <code>CF(rule) = min(CF(premises)) × CF(rule)</code>
+                                
+                                <p class="mt-3"><strong>Aturan Paralel:</strong></p>
+                                <code>CF(combined) = CF1 + CF2 - (CF1 × CF2)</code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Features -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h3 class="text-center mb-4">Fitur Sistem</h3>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <div class="card h-100 border-primary">
+                <div class="card-body text-center">
+                    <i class="fas fa-arrows-alt-h text-primary mb-3" style="font-size: 2rem;"></i>
+                    <h5>Aturan Sekuensial</h5>
+                    <p class="text-muted">
+                        Aturan yang menggunakan hasil dari aturan lain sebagai premis untuk inferensi bertingkat.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <div class="card h-100 border-success">
+                <div class="card-body text-center">
+                    <i class="fas fa-code-branch text-success mb-3" style="font-size: 2rem;"></i>
+                    <h5>Aturan Paralel</h5>
+                    <p class="text-muted">
+                        Dua atau lebih aturan yang menghasilkan kesimpulan sama dengan tingkat keyakinan berbeda.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <div class="card h-100 border-info">
+                <div class="card-body text-center">
+                    <i class="fas fa-route text-info mb-3" style="font-size: 2rem;"></i>
+                    <h5>Jejak Inferensi</h5>
+                    <p class="text-muted">
+                        Pelacakan langkah-langkah reasoning untuk transparansi dan debugging.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Knowledge Base Info -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-database me-2"></i>
+                        Basis Pengetahuan
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Domain Medis</h6>
+                            <ul>
+                                <li><strong>Infeksi:</strong> Bakteri, viral, suspek infeksi</li>
+                                <li><strong>Penyakit Paru:</strong> Pneumonia, pneumonia berat</li>
+                                <li><strong>Gastroenteritis:</strong> Ringan hingga berat</li>
+                                <li><strong>Komplikasi:</strong> Resistensi antibiotik, komplikasi serius</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Referensi Literatur</h6>
+                            <ul>
+                                <li>WHO Guidelines for Pneumonia Diagnosis (2019)</li>
+                                <li>CDC Guidelines for Infection Control (2020)</li>
+                                <li>Mayo Clinic Medical Reference (2021)</li>
+                                <li>Russell & Norvig - AI: A Modern Approach</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Usage Guide -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-book me-2"></i>
+                        Panduan Penggunaan
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Langkah-langkah Diagnosa:</h6>
+                            <ol>
+                                <li>Buka halaman <strong>Diagnosa</strong></li>
+                                <li>Pilih gejala yang dialami pasien</li>
+                                <li>Tentukan tingkat keyakinan (CF) untuk setiap gejala</li>
+                                <li>Klik tombol <strong>Diagnosa</strong></li>
+                                <li>Lihat hasil diagnosa dengan tingkat keyakinan</li>
+                                <li>Analisis jejak inferensi jika diperlukan</li>
+                            </ol>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Interpretasi Hasil:</h6>
+                            <ul>
+                                <li><strong>CF 0.8-1.0:</strong> <span class="badge bg-success">Keyakinan Sangat Tinggi</span></li>
+                                <li><strong>CF 0.6-0.8:</strong> <span class="badge bg-primary">Keyakinan Tinggi</span></li>
+                                <li><strong>CF 0.4-0.6:</strong> <span class="badge bg-warning text-dark">Keyakinan Sedang</span></li>
+                                <li><strong>CF 0.1-0.4:</strong> <span class="badge bg-secondary">Keyakinan Rendah</span></li>
+                            </ul>
+                            
+                            <div class="alert alert-warning mt-3">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <strong>Catatan:</strong> Sistem ini dirancang untuk tujuan edukatif dan penelitian. 
+                                Untuk penggunaan klinis, diperlukan validasi lebih lanjut.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Contact -->
+    <div class="row">
+        <div class="col-12 text-center">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5>Tim SISPAK 2</h5>
+                    <p class="text-muted">
+                        Sistem Pakar - Diagnosa Medis dengan Forward Chaining<br>
+                        <small>© 2025 - Dikembangkan untuk keperluan akademik</small>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

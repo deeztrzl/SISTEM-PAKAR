@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block title %}Diagnosa Pasien - Sistem Pakar Medis{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Left Panel - Input Gejala -->
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-clipboard-list me-2"></i>
+                        Input Gejala Pasien
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Petunjuk:</strong> Pilih gejala yang dialami pasien dan tentukan tingkat keyakinan (0.1 - 1.0).
+                        Semakin tinggi nilai, semakin yakin terhadap gejala tersebut.
+                    </div>
+                    
+                    <!-- Search Filter -->
+                    <div class="mb-3">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" id="symptom-search" class="form-control" 
+                                   placeholder="Cari gejala...">
+                        </div>
+                    </div>
+                    
+                    <!-- Symptoms Selection -->
+                    <form id="diagnosis-form">
+                        <div id="symptoms-container" class="row g-3">
+                            <!-- Symptoms akan dimuat via JavaScript -->
+                            <div class="text-center py-5">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2">Memuat daftar gejala...</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="mt-4 d-flex gap-3">
+                            <button type="submit" class="btn btn-success btn-lg flex-fill" id="diagnose-btn">
+                                <i class="fas fa-user-md me-2"></i>
+                                <span id="diagnose-btn-text">Diagnosa</span>
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-lg" id="reset-btn">
+                                <i class="fas fa-redo me-2"></i>
+                                Reset
+                            </button>
+                        </div>
+                        
+                        <!-- Selected Symptoms Summary -->
+                        <div id="selected-symptoms" class="mt-3" style="display: none;">
+                            <h6>Gejala Terpilih:</h6>
+                            <div id="selected-list" class="d-flex flex-wrap gap-2">
+                                <!-- Selected symptoms badges will appear here -->
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Panel - Hasil Diagnosa -->
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-heartbeat me-2"></i>
+                        Hasil Diagnosa
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Initial State -->
+                    <div id="initial-state" class="text-center py-5">
+                        <i class="fas fa-stethoscope text-muted" style="font-size: 4rem;"></i>
+                        <h5 class="text-muted mt-3">Siap untuk Diagnosa</h5>
+                        <p class="text-muted">Pilih gejala di panel kiri untuk memulai diagnosa</p>
+                    </div>
+                    
+                    <!-- Loading State -->
+                    <div id="loading-state" class="text-center py-5" style="display: none;">
+                        <div class="spinner-border text-success" style="width: 3rem; height: 3rem;" role="status">
+                            <span class="visually-hidden">Processing...</span>
+                        </div>
+                        <h5 class="mt-3">Memproses Diagnosa...</h5>
+                        <p class="text-muted">Menjalankan forward chaining inference...</p>
+                    </div>
+                    
+                    <!-- Results -->
+                    <div id="results-container" style="display: none;">
+                        <!-- Input Summary -->
+                        <div class="mb-4">
+                            <h6 class="border-bottom pb-2">
+                                <i class="fas fa-clipboard-check me-2"></i>
+                                Gejala Input
+                            </h6>
+                            <div id="input-summary"></div>
+                        </div>
+                        
+                        <!-- Main Conclusion -->
+                        <div id="main-conclusion" class="mb-4">
+                            <!-- Will be populated with main diagnosis -->
+                        </div>
+                        
+                        <!-- All Results -->
+                        <div class="mb-4">
+                            <h6 class="border-bottom pb-2">
+                                <i class="fas fa-list-ol me-2"></i>
+                                Semua Kemungkinan Diagnosa
+                            </h6>
+                            <div id="all-results"></div>
+                        </div>
+                        
+                        <!-- Processing Info -->
+                        <div class="mb-3">
+                            <h6 class="border-bottom pb-2">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Informasi Pemrosesan
+                            </h6>
+                            <div id="processing-info"></div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-primary" id="show-trace-btn">
+                                <i class="fas fa-route me-2"></i>
+                                Jejak Inferensi
+                            </button>
+                            <button class="btn btn-outline-success" id="export-btn">
+                                <i class="fas fa-download me-2"></i>
+                                Export PDF
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Error State -->
+                    <div id="error-state" class="alert alert-danger" style="display: none;">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Error:</strong> <span id="error-message"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Inference Trace Modal -->
+<div class="modal fade" id="traceModal" tabindex="-1" aria-labelledby="traceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="traceModalLabel">
+                    <i class="fas fa-route me-2"></i>
+                    Jejak Inferensi Forward Chaining
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="trace-content">
+                    <!-- Trace content will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confidence Level Chart Modal -->
+<div class="modal fade" id="chartModal" tabindex="-1" aria-labelledby="chartModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="chartModalLabel">
+                    <i class="fas fa-chart-bar me-2"></i>
+                    Visualisasi Tingkat Keyakinan
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <canvas id="confidenceChart" width="400" height="200"></canvas>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/diagnosis.js') }}"></script>
+{% endblock %}

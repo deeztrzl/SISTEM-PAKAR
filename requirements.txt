@@ -1,0 +1,22 @@
+# Requirements untuk Sistem Pakar Diagnosa Medis
+# Python version: >= 3.7
+
+# Web Framework
+Flask>=2.0.0
+Flask-CORS>=3.0.0
+
+# Built-in libraries yang digunakan:
+# - tkinter (untuk GUI - optional)
+# - json (untuk parsing rules.json)  
+# - os (untuk file operations)
+# - sys (untuk system operations)
+# - copy (untuk deep copying)
+# - typing (untuk type hints)
+
+# Installation:
+# pip install Flask Flask-CORS
+
+# Untuk development dan testing (optional):
+# pytest>=6.0.0
+# pylint>=2.0.0
+# black>=21.0.0

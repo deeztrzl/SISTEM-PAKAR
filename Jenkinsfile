@@ -201,35 +201,7 @@ pipeline {
     
     post {
         always {
-            script {
-                echo "📊 Publishing reports..."
-                
-                // Junit test reports
-                junit testResults: 'reports/**/*.xml', allowEmptyResults: true
-                
-                // Coverage reports
-                publishHTML([
-                    reportDir: 'coverage-report',
-                    reportFiles: 'index.html',
-                    reportName: 'Coverage Report',
-                    keepAll: true,
-                    alwaysLinkToLastBuild: true
-                ])
-                
-                // Archive artifacts
-                archiveArtifacts artifacts: 'reports/**/*,coverage-report/**/*', 
-                                 allowEmptyArchive: true
-                
-                // Cleanup
-                cleanWs(
-                    deleteDirs: true,
-                    patterns: [
-                        [pattern: '.venv', type: 'INCLUDE'],
-                        [pattern: '__pycache__', type: 'INCLUDE'],
-                        [pattern: '.pytest_cache', type: 'INCLUDE']
-                    ]
-                )
-            }
+            notifyN8N()
         }
         
         success {

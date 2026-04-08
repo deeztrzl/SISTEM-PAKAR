@@ -203,7 +203,6 @@ pipeline {
         always {
             notifyN8N()
         }
-    }
         
         success {
             script {
@@ -235,3 +234,4 @@ pipeline {
             }
         }
     }
+}

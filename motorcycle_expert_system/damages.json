@@ -1,0 +1,57 @@
+{
+  "A01": {
+    "name": "Kerusakan Sistem Kelistrikan",
+    "description": "Masalah pada baterai, alternator, atau kabel listrik",
+    "solution": "Periksa baterai, cek tegangan alternator, periksa kabel-kabel listrik yang longgar atau putus"
+  },
+  "A02": {
+    "name": "Kerusakan Sistem Bahan Bakar",
+    "description": "Masalah pada karburator, injektor, atau saluran bahan bakar",
+    "solution": "Bersihkan karburator/injektor, ganti filter bahan bakar, periksa pompa bensin"
+  },
+  "A03": {
+    "name": "Kerusakan Sistem Pengapian",
+    "description": "Masalah pada busi, koil, atau CDI",
+    "solution": "Ganti busi, periksa koil pengapian, cek kondisi CDI"
+  },
+  "A04": {
+    "name": "Kerusakan Mesin/Piston",
+    "description": "Masalah pada piston, ring piston, atau silinder",
+    "solution": "Overhaul mesin, ganti ring piston, boring silinder jika perlu"
+  },
+  "A05": {
+    "name": "Kerusakan Sistem Pendinginan",
+    "description": "Masalah pada radiator, thermostat, atau water pump",
+    "solution": "Kuras dan isi ulang coolant, periksa radiator, ganti thermostat"
+  },
+  "A06": {
+    "name": "Kerusakan CVT (Continuously Variable Transmission)",
+    "description": "Masalah pada belt CVT, pulley, atau roller",
+    "solution": "Ganti belt CVT, bersihkan pulley, ganti roller yang aus"
+  },
+  "A07": {
+    "name": "Kerusakan Sistem Rem",
+    "description": "Masalah pada kampas rem, disk brake, atau master rem",
+    "solution": "Ganti kampas rem, periksa disk brake, bleeding sistem rem"
+  },
+  "A08": {
+    "name": "Kerusakan Sistem Suspensi",
+    "description": "Masalah pada shock absorber atau bushing",
+    "solution": "Ganti shock absorber, periksa dan ganti bushing yang aus"
+  },
+  "A09": {
+    "name": "Kerusakan Sistem Roda/Ban",
+    "description": "Masalah pada bearing roda atau alignment",
+    "solution": "Ganti bearing roda, lakukan wheel alignment, periksa kondisi ban"
+  },
+  "A10": {
+    "name": "Kerusakan Sistem Pelumas",
+    "description": "Masalah pada pompa oli atau seal oli",
+    "solution": "Ganti pompa oli, ganti seal oli yang bocor, gunakan oli yang sesuai spesifikasi"
+  },
+  "A11": {
+    "name": "Kerusakan Sistem Charging",
+    "description": "Masalah pada regulator atau stator",
+    "solution": "Ganti regulator rectifier, periksa kondisi stator, cek kabel charging"
+  }
+}

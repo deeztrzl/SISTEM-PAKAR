@@ -1,0 +1,177 @@
+[
+  {
+    "id": "R1",
+    "if": ["K01", "K02", "K03"],
+    "then": "A01",
+    "cf": 0.9,
+    "description": "Motor mati total karena masalah kelistrikan"
+  },
+  {
+    "id": "R2",
+    "if": ["K01", "K04"],
+    "then": "A01",
+    "cf": 0.7,
+    "description": "Sistem kelistrikan bermasalah"
+  },
+  {
+    "id": "R3",
+    "if": ["K05", "K06"],
+    "then": "A02",
+    "cf": 0.8,
+    "description": "Masalah pada sistem bahan bakar"
+  },
+  {
+    "id": "R4",
+    "if": ["K05", "K07"],
+    "then": "A03",
+    "cf": 0.75,
+    "description": "Sistem pengapian bermasalah"
+  },
+  {
+    "id": "R5",
+    "if": ["K07", "K08", "K09"],
+    "then": "A02",
+    "cf": 0.85,
+    "description": "Karburator/injektor kotor"
+  },
+  {
+    "id": "R6",
+    "if": ["K10"],
+    "then": "A02",
+    "cf": 0.8,
+    "description": "Campuran bahan bakar terlalu kaya"
+  },
+  {
+    "id": "R7",
+    "if": ["K11"],
+    "then": "A05",
+    "cf": 0.9,
+    "description": "Kebocoran coolant atau head gasket"
+  },
+  {
+    "id": "R8",
+    "if": ["K12", "K16"],
+    "then": "A04",
+    "cf": 0.95,
+    "description": "Ring piston atau valve seal aus"
+  },
+  {
+    "id": "R9",
+    "if": ["K13", "K34"],
+    "then": "A04",
+    "cf": 0.8,
+    "description": "Komponen mesin aus"
+  },
+  {
+    "id": "R10",
+    "if": ["K14", "K15"],
+    "then": "A05",
+    "cf": 0.9,
+    "description": "Sistem pendinginan bermasalah"
+  },
+  {
+    "id": "R11",
+    "if": ["K17", "K18"],
+    "then": "A06",
+    "cf": 0.85,
+    "description": "CVT perlu perawatan"
+  },
+  {
+    "id": "R12",
+    "if": ["K19", "K20"],
+    "then": "A06",
+    "cf": 0.8,
+    "description": "Belt atau roller CVT aus"
+  },
+  {
+    "id": "R13",
+    "if": ["K21", "K24"],
+    "then": "A07",
+    "cf": 0.9,
+    "description": "Sistem rem depan bermasalah"
+  },
+  {
+    "id": "R14",
+    "if": ["K22", "K23"],
+    "then": "A07",
+    "cf": 0.85,
+    "description": "Kampas rem aus atau kotor"
+  },
+  {
+    "id": "R15",
+    "if": ["K25", "K26"],
+    "then": "A08",
+    "cf": 0.8,
+    "description": "Suspensi atau bearing stang bermasalah"
+  },
+  {
+    "id": "R16",
+    "if": ["K27", "K28"],
+    "then": "A09",
+    "cf": 0.75,
+    "description": "Masalah alignment atau bearing roda"
+  },
+  {
+    "id": "R17",
+    "if": ["K29", "K32"],
+    "then": "A11",
+    "cf": 0.8,
+    "description": "Sistem charging bermasalah"
+  },
+  {
+    "id": "R18",
+    "if": ["K30", "K31"],
+    "then": "A01",
+    "cf": 0.7,
+    "description": "Masalah kelistrikan aksesoris"
+  },
+  {
+    "id": "R19",
+    "if": ["K33"],
+    "then": "A09",
+    "cf": 0.85,
+    "description": "Bearing roda aus"
+  },
+  {
+    "id": "R20",
+    "if": ["K16", "K34"],
+    "then": "A10",
+    "cf": 0.9,
+    "description": "Sistem pelumasan bermasalah"
+  },
+  {
+    "id": "R21",
+    "if": ["K08", "K17"],
+    "then": "A06",
+    "cf": 0.7,
+    "description": "CVT tidak optimal (aturan paralel)"
+  },
+  {
+    "id": "R22",
+    "if": ["K14"],
+    "then": "A10",
+    "cf": 0.6,
+    "description": "Oli tidak berfungsi optimal (aturan paralel)"
+  },
+  {
+    "id": "R23",
+    "if": ["A01"],
+    "then": "K32",
+    "cf": 0.8,
+    "description": "Kerusakan kelistrikan menyebabkan baterai tekor (aturan sekuensial)"
+  },
+  {
+    "id": "R24",
+    "if": ["A04"],
+    "then": "K14",
+    "cf": 0.7,
+    "description": "Kerusakan mesin menyebabkan overheat (aturan sekuensial)"
+  },
+  {
+    "id": "R25",
+    "if": ["A02", "K09"],
+    "then": "K10",
+    "cf": 0.75,
+    "description": "Masalah bahan bakar lanjutan (aturan sekuensial)"
+  }
+]

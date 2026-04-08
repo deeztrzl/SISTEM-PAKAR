@@ -41,6 +41,15 @@ def health():
         'rules_count': len(inference_engine.rules) if inference_engine else 0
     })
 
+@app.route('/api/status', methods=['GET'])
+def status():
+    """Alias untuk /api/health - digunakan oleh Jenkins"""
+    return jsonify({
+        'status': 'healthy',
+        'engine_loaded': inference_engine is not None,
+        'rules_count': len(inference_engine.rules) if inference_engine else 0
+    })
+
 @app.route('/api/diagnose', methods=['POST'])
 def diagnose():
     try:

@@ -11,8 +11,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 # Setup test environment variables
-os.environ['FLASK_ENV'] = 'testing'
-os.environ['TESTING'] = 'true'
+os.environ["FLASK_ENV"] = "testing"
+os.environ["TESTING"] = "true"
 
 
 def pytest_configure(config):
@@ -21,9 +21,7 @@ def pytest_configure(config):
     config.addinivalue_line(
         "markers", "slow: marks tests as slow (deselect with '-m \"not slow\"')"
     )
-    config.addinivalue_line(
-        "markers", "integration: marks tests as integration tests"
-    )
+    config.addinivalue_line("markers", "integration: marks tests as integration tests")
 
 
 @pytest.fixture(scope="session")

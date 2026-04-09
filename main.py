@@ -29,7 +29,7 @@ try:
     from ui.gui import ExpertSystemGUI
     from inference_engine import InferenceEngine
 except ImportError as e:
-    print(f"Error importing modules: {e}")
+    printq(f"Error importing modules: {e}")
     print("Pastikan semua file dan folder berada di lokasi yang benar")
     sys.exit(1)
 
@@ -109,7 +109,7 @@ def main():
         try:
             # root.iconbitmap('icon.ico')  # Uncomment jika ada icon
             pass
-        except:
+        except Exception:
             pass
         
         # Atur behavior saat window ditutup
@@ -120,7 +120,7 @@ def main():
         root.protocol("WM_DELETE_WINDOW", on_closing)
         
         # Buat aplikasi
-        app = ExpertSystemGUI(root)
+        app = ExpertSystemGUI(root)  # noqa: F841
         
         print("GUI berhasil dimuat!")
         print("Silakan gunakan interface untuk melakukan diagnosa.")

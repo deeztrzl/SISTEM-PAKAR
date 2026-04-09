@@ -10,4 +10,4 @@ Modules:
 
 from .gui import ExpertSystemGUI
 
-__all__ = ['ExpertSystemGUI']
+__all__ = ["ExpertSystemGUI"]

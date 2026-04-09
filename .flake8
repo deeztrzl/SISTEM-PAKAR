@@ -1,0 +1,35 @@
+[flake8]
+# Flake8 Configuration for Medical Expert System
+
+# Match Black's default line length
+max-line-length = 88
+
+# Ignore specific error codes
+# E501: Line too long (handled by Black)
+# W503: Line break before binary operator (conflicts with Black)
+# W504: Line break after binary operator
+# E402: Module level import not at top (acceptable in some cases)
+ignore = E501, W503, W504, E402
+
+# Exclude common non-code directories
+exclude =
+    .git,
+    __pycache__,
+    .venv,
+    venv,
+    .eggs,
+    *.egg-info,
+    build,
+    dist,
+    .pytest_cache,
+    .coverage,
+    htmlcov,
+    reports
+
+# Per-file ignores for test files
+per-file-ignores =
+    tests/*:F401,F841,E722,C901
+    **/test_*.py:F401,F841,E722,C901
+
+# Maximum complexity for McCabe
+max-complexity = 10

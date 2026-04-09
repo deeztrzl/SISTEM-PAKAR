@@ -11,4 +11,4 @@ Modules:
 
 from .forward_chaining import InferenceEngine
 
-__all__ = ['InferenceEngine']
+__all__ = ["InferenceEngine"]

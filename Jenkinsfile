@@ -104,19 +104,17 @@ pipeline {
     }
     
     post {
-        always {
-            notifyN8N()
-        }
-        
         success {
             script {
                 echo "✅ Pipeline completed successfully!"
+                appLogNotify()
             }
         }
         
         failure {
             script {
                 echo "❌ Pipeline failed!"
+                notifyN8N()
             }
         }
         

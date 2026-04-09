@@ -1,6 +1,6 @@
 import json
 import os
-from typing import List, Dict, Tuple, Any
+from typing import List, Dict, Tuple
 
 
 class InferenceEngine:
@@ -267,15 +267,18 @@ class InferenceEngine:
         self.fired_rules = []
         self.inference_trace = []
 
-    def infer(self, initial_facts: Dict[str, float]) -> Dict[str, Any]:
+    def infer(self, initial_facts: Dict) -> list:
         """
         Metode utama untuk melakukan inferensi dengan input gejala
 
         Args:
-            initial_facts: Dictionary gejala dengan CF {symptom: cf_value}
+            initial_facts: Dictionary gejala dengan CF
+                Format: {symptom: {"present": bool, "cf": float}}
+                atau {symptom: cf_value} (deprecated)
 
         Returns:
-            Dictionary hasil inferensi lengkap dengan format yang sesuai untuk web API
+            List[Dict]: Daftar hasil diagnosa diurutkan berdasarkan CF descending
+                Setiap dict berisi: {"conclusion", "cf", "percentage", "display_name"}
         """
         # Reset engine state
         self.reset()
@@ -284,12 +287,12 @@ class InferenceEngine:
         self.add_initial_facts(initial_facts)
 
         # Run forward chaining
-        results = self.forward_chaining()
+        self.forward_chaining()
 
         # Get conclusions
         conclusions = self.get_conclusions(threshold=0.1)  # Lower threshold for demo
 
-        # Format results for web API
+        # Format results for API
         formatted_results = []
         for conclusion, cf in conclusions.items():
             if conclusion not in initial_facts:
@@ -303,44 +306,9 @@ class InferenceEngine:
                     }
                 )
 
-        # Sort by confidence
+        # Sort by confidence (descending)
         formatted_results.sort(key=lambda x: x["cf"], reverse=True)
-
-        # Format most likely conclusion
-        most_likely_formatted = None
-        if formatted_results:
-            # Get the highest CF result from our formatted results
-            highest_result = formatted_results[0]  # Already sorted by CF
-            most_likely_formatted = {
-                "conclusion": highest_result["conclusion"],
-                "cf": highest_result["cf"],
-                "percentage": highest_result["percentage"],
-                "display_name": highest_result["display_name"],
-            }
-
-        # Format input symptoms
-        input_symptoms_formatted = {}
-        for symptom, cf in initial_facts.items():
-            input_symptoms_formatted[symptom] = {
-                "cf": cf,
-                "display_name": self.format_display_name(symptom),
-            }
-
-        return {
-            "success": True,
-            "input_symptoms": input_symptoms_formatted,
-            "results": formatted_results,
-            "most_likely_conclusion": most_likely_formatted,
-            "fired_rules": self.fired_rules,
-            "inference_trace": self.get_inference_trace(),
-            "processing_info": {
-                "total_rules_available": len(self.rules),
-                "rules_fired": len(self.fired_rules),
-                "facts_derived": len(
-                    [fact for fact in results.keys() if fact not in initial_facts]
-                ),
-            },
-        }
+        return formatted_results
 
     def format_display_name(self, name: str) -> str:
         """

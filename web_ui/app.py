@@ -186,10 +186,16 @@ def api_diagnose():  # noqa: C901
 
         # Jalankan inferensi menggunakan method infer yang baru
         try:
-            result = inference_engine.infer(validated_symptoms)
+            results = inference_engine.infer(validated_symptoms)
 
-            # result sudah dalam format yang tepat untuk web API
-            response_data = result
+            # Wrap results dalam response format yang sesuai untuk web API
+            most_likely = results[0] if results else None
+            response_data = {
+                "success": True,
+                "results": results,
+                "most_likely_conclusion": most_likely,
+                "total_results": len(results),
+            }
 
         except Exception as e:
             print(f"Error during inference: {e}")

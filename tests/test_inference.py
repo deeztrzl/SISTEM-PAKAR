@@ -68,8 +68,8 @@ class TestForwardChaining:
     """Test forward chaining algorithm"""
 
     def test_simple_diagnosis_chain(self, inference_engine):
-        """Test inferensi simple dengan 1 gejala"""
-        symptoms = {"fever": {"present": True, "cf": 0.9}}
+        """Test inferensi simple dengan 1 symptom group"""
+        symptoms = {"demam_tinggi": {"present": True, "cf": 0.9}}
         results = inference_engine.infer(symptoms)
         assert results is not None
         assert len(results) >= 0
@@ -77,16 +77,16 @@ class TestForwardChaining:
     def test_multiple_symptoms_inference(self, inference_engine):
         """Test inferensi dengan multiple gejala"""
         symptoms = {
-            "fever": {"present": True, "cf": 0.9},
-            "cough": {"present": True, "cf": 0.8},
-            "difficulty_breathing": {"present": True, "cf": 0.85},
+            "demam_tinggi": {"present": True, "cf": 0.9},
+            "batuk_kering": {"present": True, "cf": 0.8},
+            "sesak_napas": {"present": True, "cf": 0.85},
         }
         results = inference_engine.infer(symptoms)
         assert results is not None
 
     def test_no_matching_rules(self, inference_engine):
-        """Test ketika tidak ada aturan yang match"""
-        symptoms = {"unknown_symptom_xyz": {"present": True, "cf": 0.9}}
+        """Test ketika tidak ada aturan yang match dengan input unknown"""
+        symptoms = {"unknown_symptom_xyz_notinrules": {"present": True, "cf": 0.9}}
         results = inference_engine.infer(symptoms)
         # Should return empty or handle gracefully
         assert isinstance(results, (list, dict, type(None)))
@@ -147,21 +147,26 @@ class TestDiagnosisResults:
 
     def test_results_have_required_fields(self, inference_engine):
         """Test hasil diagnosa memiliki field yang diperlukan"""
-        symptoms = {"fever": {"present": True, "cf": 0.9}}
+        # Using actual symptom names from rules
+        symptoms = {
+            "demam_tinggi": {"present": True, "cf": 0.9},
+            "sakit_kepala": {"present": True, "cf": 0.8},
+        }
         results = inference_engine.infer(symptoms)
 
         if results and len(results) > 0:
             result = results[0]
             # Check required fields
-            assert "diagnosis" in result or "name" in result
+            assert "conclusion" in result or "diagnosis" in result
             assert "cf" in result or "certainty" in result
 
     def test_results_sorted_by_cf(self, inference_engine):
         """Test hasil diagnosa diurutkan berdasarkan CF descending"""
+        # Using actual symptom names from rules
         symptoms = {
-            "fever": {"present": True, "cf": 0.9},
-            "cough": {"present": True, "cf": 0.8},
-            "difficulty_breathing": {"present": True, "cf": 0.85},
+            "demam_tinggi": {"present": True, "cf": 0.9},
+            "batuk_kering": {"present": True, "cf": 0.8},
+            "sesak_napas": {"present": True, "cf": 0.85},
         }
         results = inference_engine.infer(symptoms)
 

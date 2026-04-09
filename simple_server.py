@@ -59,7 +59,7 @@ def status():
 
 
 @app.route("/api/diagnose", methods=["POST"])
-def diagnose():
+def diagnose():  # noqa: C901
     try:
         print("📨 Received diagnosis request")
 

@@ -107,7 +107,6 @@ pipeline {
         success {
             script {
                 echo "✅ Pipeline completed successfully!"
-                appLogNotify()
             }
         }
         

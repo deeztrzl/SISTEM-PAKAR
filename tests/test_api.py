@@ -42,7 +42,7 @@ def start_api_server():
             try:
                 requests.get(f"{API_URL}/status", timeout=2)
                 break
-            except:
+            except Exception as e:
                 time.sleep(1)
 
         yield

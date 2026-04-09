@@ -29,7 +29,7 @@ try:
     from ui.gui import ExpertSystemGUI
     from inference_engine import InferenceEngine
 except ImportError as e:
-    printq(f"Error importing modules: {e}")
+    print(f"Error importing modules: {e}")
     print("Pastikan semua file dan folder berada di lokasi yang benar")
     sys.exit(1)
 

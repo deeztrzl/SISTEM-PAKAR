@@ -26,7 +26,7 @@ inference_engine = None
 def init_engine():
     global inference_engine
     try:
-        rules_path = os.path.join(parent_dir, "rules.json")
+        rules_path = os.path.join(current_dir, "rules.json")
         inference_engine = InferenceEngine(rules_path)
         print(f"✅ Engine initialized with {len(inference_engine.rules)} rules")
         return True
@@ -71,8 +71,16 @@ def diagnose():
                 500,
             )
 
-        # Get request data
-        data = request.get_json()
+        # Get request data with error handling
+        try:
+            data = request.get_json()
+        except Exception as e:
+            print(f"❌ Error parsing JSON: {e}")
+            return (
+                jsonify({"success": False, "error": f"Invalid JSON: {str(e)}"}),
+                400,
+            )
+
         print(f"📝 Request data: {data}")
 
         if not data or "symptoms" not in data:
@@ -84,11 +92,17 @@ def diagnose():
         symptoms = data["symptoms"]
         print(f"🔬 Symptoms to diagnose: {symptoms}")
 
-        # Validate symptoms
+        # Validate symptoms - handle both flat and nested formats
         validated_symptoms = {}
-        for symptom, cf in symptoms.items():
+        for symptom, value in symptoms.items():
             try:
-                cf_float = float(cf)
+                # Handle nested format: {symptom: {present: bool, cf: value}}
+                if isinstance(value, dict) and "cf" in value:
+                    cf_float = float(value["cf"])
+                # Handle flat format: {symptom: cf_value}
+                else:
+                    cf_float = float(value)
+
                 if not (0.1 <= cf_float <= 1.0):
                     return (
                         jsonify(
@@ -100,7 +114,7 @@ def diagnose():
                         400,
                     )
                 validated_symptoms[symptom] = cf_float
-            except (ValueError, TypeError):
+            except (ValueError, TypeError, AttributeError):
                 return (
                     jsonify(
                         {
@@ -115,22 +129,51 @@ def diagnose():
 
         # Run inference
         print("🔄 Running inference...")
-        result = inference_engine.infer(validated_symptoms)
-        print(f"✅ Inference completed: {result.get('success')}")
+        results = inference_engine.infer(validated_symptoms)
+        print(f"✅ Inference completed: {len(results)} results")
 
         # Log hasil
-        if result.get("most_likely_conclusion"):
+        if results:
             print(
-                f"🎯 Most likely: {result['most_likely_conclusion']['display_name']} (CF: {result['most_likely_conclusion']['cf']:.3f})"
+                f"🎯 Most likely: {results[0]['display_name']} (CF: {results[0]['cf']:.3f})"
             )
 
-        return jsonify(result)
+        # Wrap results dalam format yang sesuai untuk API
+        response_data = {
+            "success": True,
+            "results": results,
+            "most_likely_conclusion": results[0] if results else None,
+            "total_results": len(results),
+        }
+        return jsonify(response_data)
 
     except Exception as e:
         print(f"❌ Error in diagnosis: {e}")
         import traceback
 
         traceback.print_exc()
+        return jsonify({"success": False, "error": f"Server error: {str(e)}"}), 500
+
+
+@app.route("/api/rules", methods=["GET"])
+def get_rules():
+    """Get all diagnostic rules"""
+    try:
+        if not inference_engine or not inference_engine.rules:
+            return (
+                jsonify({"success": False, "error": "No rules loaded"}),
+                500,
+            )
+
+        return jsonify(
+            {
+                "success": True,
+                "rules": inference_engine.rules,
+                "total_rules": len(inference_engine.rules),
+            }
+        )
+    except Exception as e:
+        print(f"❌ Error retrieving rules: {e}")
         return jsonify({"success": False, "error": f"Server error: {str(e)}"}), 500
 
 

@@ -21,38 +21,47 @@ API_TIMEOUT = 5
 @pytest.fixture(scope="session", autouse=True)
 def start_api_server():
     """Start Flask API server untuk testing"""
-    # Try to start the server
+    server_process = None
     try:
         # Check if server is already running
         requests.get(f"{API_URL}/status", timeout=2)
         yield
         return
-    except:
+    except Exception:
         # Start server in background
-        server_process = subprocess.Popen(
-            ["python", "simple_server.py"],
-            cwd=str(Path(__file__).parent.parent),
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-
-        # Wait for server to start
-        max_retries = 30
-        for i in range(max_retries):
-            try:
-                requests.get(f"{API_URL}/status", timeout=2)
-                break
-            except Exception as e:
-                time.sleep(1)
-
-        yield
-
-        # Cleanup
-        server_process.terminate()
         try:
-            server_process.wait(timeout=5)
-        except subprocess.TimeoutExpired:
-            server_process.kill()
+            server_process = subprocess.Popen(
+                ["python3", "simple_server.py"],
+                cwd=str(Path(__file__).parent.parent),
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+
+            # Wait for server to start
+            max_retries = 30
+            server_started = False
+            for i in range(max_retries):
+                try:
+                    requests.get(f"{API_URL}/status", timeout=2)
+                    server_started = True
+                    break
+                except Exception:
+                    time.sleep(1)
+
+            if not server_started:
+                raise RuntimeError(
+                    f"Failed to start API server after {max_retries} retries"
+                )
+
+            yield
+        finally:
+            # Cleanup
+            if server_process:
+                server_process.terminate()
+                try:
+                    server_process.wait(timeout=5)
+                except subprocess.TimeoutExpired:
+                    server_process.kill()
 
 
 class TestAPIEndpoints:
@@ -87,7 +96,7 @@ class TestDiagnosisAPI:
 
     def test_valid_diagnosis_request(self):
         """Test diagnosis request dengan data valid"""
-        payload = {"symptoms": {"fever": {"present": True, "cf": 0.9}}}
+        payload = {"symptoms": {"demam_tinggi": {"present": True, "cf": 0.9}}}
         response = requests.post(
             f"{API_URL}/diagnose", json=payload, timeout=API_TIMEOUT
         )
@@ -99,9 +108,9 @@ class TestDiagnosisAPI:
         """Test diagnosis dengan multiple symptoms"""
         payload = {
             "symptoms": {
-                "fever": {"present": True, "cf": 0.9},
-                "cough": {"present": True, "cf": 0.8},
-                "difficulty_breathing": {"present": True, "cf": 0.85},
+                "demam_tinggi": {"present": True, "cf": 0.9},
+                "batuk_kering": {"present": True, "cf": 0.8},
+                "sesak_napas": {"present": True, "cf": 0.85},
             }
         }
         response = requests.post(
@@ -122,7 +131,7 @@ class TestDiagnosisAPI:
 
     def test_invalid_cf_values(self):
         """Test diagnosis dengan invalid CF"""
-        payload = {"symptoms": {"fever": {"present": True, "cf": 1.5}}}  # CF > 1
+        payload = {"symptoms": {"demam_tinggi": {"present": True, "cf": 1.5}}}  # CF > 1
         response = requests.post(
             f"{API_URL}/diagnose", json=payload, timeout=API_TIMEOUT
         )
@@ -131,7 +140,7 @@ class TestDiagnosisAPI:
 
     def test_diagnosis_response_format(self):
         """Test format response diagnosis"""
-        payload = {"symptoms": {"fever": {"present": True, "cf": 0.9}}}
+        payload = {"symptoms": {"demam_tinggi": {"present": True, "cf": 0.9}}}
         response = requests.post(
             f"{API_URL}/diagnose", json=payload, timeout=API_TIMEOUT
         )
@@ -175,8 +184,8 @@ class TestAPIPerformance:
         """Test diagnosis response time < 2 detik"""
         payload = {
             "symptoms": {
-                "fever": {"present": True, "cf": 0.9},
-                "cough": {"present": True, "cf": 0.8},
+                "demam_tinggi": {"present": True, "cf": 0.9},
+                "batuk_kering": {"present": True, "cf": 0.8},
             }
         }
 
@@ -195,9 +204,9 @@ class TestAPIPerformance:
         """Test API bisa handle multiple concurrent requests"""
         import concurrent.futures
 
-        payload = {"symptoms": {"fever": {"present": True, "cf": 0.9}}}
+        payload = {"symptoms": {"demam_tinggi": {"present": True, "cf": 0.9}}}
 
-        def make_request():
+        def make_request(request_id):
             response = requests.post(
                 f"{API_URL}/diagnose", json=payload, timeout=API_TIMEOUT
             )

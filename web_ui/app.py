@@ -157,11 +157,17 @@ def api_diagnose():  # noqa: C901
                 400,
             )
 
-        # Validasi CF values
+        # Validasi CF values - handle both flat and nested formats
         validated_symptoms = {}
-        for symptom, cf_value in symptoms.items():
+        for symptom, value in symptoms.items():
             try:
-                cf_float = float(cf_value)
+                # Handle nested format: {symptom: {present: bool, cf: value}}
+                if isinstance(value, dict) and "cf" in value:
+                    cf_float = float(value["cf"])
+                # Handle flat format: {symptom: cf_value}
+                else:
+                    cf_float = float(value)
+
                 if not (0.1 <= cf_float <= 1.0):
                     return (
                         jsonify(
@@ -173,12 +179,12 @@ def api_diagnose():  # noqa: C901
                         400,
                     )
                 validated_symptoms[symptom] = cf_float
-            except (ValueError, TypeError):
+            except (ValueError, TypeError, AttributeError):
                 return (
                     jsonify(
                         {
                             "success": False,
-                            "error": f"CF untuk {symptom} harus berupa angka, diberikan: {cf_value}",
+                            "error": f"CF untuk {symptom} harus berupa angka, diberikan: {value}",
                         }
                     ),
                     400,

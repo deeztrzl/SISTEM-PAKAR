@@ -1,4 +1,5 @@
 import json
+import os
 from typing import List, Dict, Tuple, Any
 
 
@@ -33,32 +34,61 @@ class InferenceEngine:
 
         Returns:
             List[Dict]: Daftar rules
+
+        Raises:
+            FileNotFoundError: Jika file rules tidak ditemukan
+            json.JSONDecodeError: Jika format JSON tidak valid
         """
+        if not os.path.exists(rules_file):
+            raise FileNotFoundError(f"Rules file tidak ditemukan: {rules_file}")
+
         try:
             with open(rules_file, "r", encoding="utf-8") as f:
                 rules = json.load(f)
             print(f"Berhasil memuat {len(rules)} rules dari {rules_file}")
             return rules
-        except FileNotFoundError:
-            print(f"Error: File {rules_file} tidak ditemukan!")
-            return []
-        except json.JSONDecodeError:
-            print(f"Error: Format JSON tidak valid dalam file {rules_file}")
-            return []
+        except json.JSONDecodeError as e:
+            raise json.JSONDecodeError(
+                f"Format JSON tidak valid dalam file {rules_file}", e.doc, e.pos
+            )
 
-    def add_initial_facts(self, initial_facts: Dict[str, float]):
+    def add_initial_facts(self, initial_facts: Dict):
         """
         Menambahkan fakta awal dengan certainty factor
 
         Args:
-            initial_facts (Dict[str, float]): {fact: cf_value}
+            initial_facts (Dict): Dapat berupa:
+                - Dict[str, float]: {fact: cf_value}
+                - Dict[str, Dict]: {fact: {"present": bool, "cf": float}}
+
+        Raises:
+            ValueError: Jika CF tidak numeric atau diluar range [0, 1]
+            TypeError: Jika struktur data tidak valid
         """
-        for fact, cf in initial_facts.items():
-            if 0 <= cf <= 1:
-                self.facts[fact] = cf
-                self.inference_trace.append(f"Fakta awal: {fact} (CF: {cf:.2f})")
+        for fact, value in initial_facts.items():
+            # Extract CF value dari struktur yang berbeda
+            if isinstance(value, dict):
+                # Format: {"present": bool, "cf": float}
+                if "cf" not in value:
+                    raise KeyError(f"CF untuk {fact} tidak ditemukan dalam dict")
+                cf = value["cf"]
             else:
-                print(f"Warning: CF untuk {fact} harus antara 0-1, diabaikan")
+                # Format: float value langsung
+                cf = value
+
+            # Validasi tipe data
+            if not isinstance(cf, (int, float)):
+                raise TypeError(
+                    f"CF untuk {fact} harus numeric, got {type(cf).__name__}"
+                )
+
+            # Validasi range
+            if not (0 <= cf <= 1):
+                raise ValueError(f"CF untuk {fact} harus antara 0-1, got {cf}")
+
+            # Store validated fact
+            self.facts[fact] = cf
+            self.inference_trace.append(f"Fakta awal: {fact} (CF: {cf:.2f})")
 
     def combine_certainty_factors(self, cf1: float, cf2: float) -> float:
         """

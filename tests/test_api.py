@@ -22,46 +22,110 @@ API_TIMEOUT = 5
 def start_api_server():
     """Start Flask API server untuk testing"""
     server_process = None
+    server_log_stdout = None
+    server_log_stderr = None
+
     try:
         # Check if server is already running
-        requests.get(f"{API_URL}/status", timeout=2)
-        yield
-        return
-    except Exception:
-        # Start server in background
         try:
-            server_process = subprocess.Popen(
-                ["python3", "simple_server.py"],
-                cwd=str(Path(__file__).parent.parent),
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
+            resp = requests.get(f"{API_URL}/status", timeout=2)
+            if resp.status_code == 200:
+                print("\n✅ API server already running on port 5000")
+                yield
+                return
+        except Exception:
+            pass
+
+        # Start server in background with proper error handling
+        print(f"\n🚀 Starting API server from {Path(__file__).parent.parent}...")
+
+        # Create log files to capture server output
+        import tempfile
+
+        log_dir = tempfile.gettempdir()
+        if os.path.exists(log_dir):
+            server_log_stdout = open(
+                os.path.join(log_dir, "sispak_server_stdout.log"), "w"
+            )
+            server_log_stderr = open(
+                os.path.join(log_dir, "sispak_server_stderr.log"), "w"
             )
 
-            # Wait for server to start
-            max_retries = 30
+        try:
+            # Use Python explicitly to run the server
+            import sys as sys_module
+
+            python_path = sys_module.executable
+
+            server_process = subprocess.Popen(
+                [python_path, "simple_server.py"],
+                cwd=str(Path(__file__).parent.parent),
+                stdout=server_log_stdout or subprocess.PIPE,
+                stderr=server_log_stderr or subprocess.PIPE,
+                preexec_fn=None,  # Required for proper subprocess handling
+            )
+
+            print(f"📋 Server process started with PID {server_process.pid}")
+
+            # Wait for server to start with better diagnostics
+            max_retries = 40  # Increased from 30
             server_started = False
-            for i in range(max_retries):
+            last_error = None
+
+            for attempt in range(max_retries):
                 try:
-                    requests.get(f"{API_URL}/status", timeout=2)
-                    server_started = True
-                    break
-                except Exception:
+                    resp = requests.get(f"{API_URL}/status", timeout=2)
+                    if resp.status_code == 200:
+                        print(
+                            f"✅ API server ready (attempt {attempt + 1}/{max_retries})"
+                        )
+                        server_started = True
+                        break
+                except Exception as e:
+                    last_error = str(e)
+                    if attempt % 10 == 0:  # Log every 10 attempts
+                        print(
+                            f"⏳ Waiting for server... (attempt {attempt + 1}/{max_retries})"
+                        )
                     time.sleep(1)
 
             if not server_started:
-                raise RuntimeError(
-                    f"Failed to start API server after {max_retries} retries"
-                )
+                # Try to read server output for debugging
+                error_msg = f"Failed to start API server after {max_retries} attempts. Last error: {last_error}"
+                if server_log_stderr:
+                    try:
+                        server_log_stderr.flush()
+                        with open(server_log_stderr.name) as f:
+                            stderr_content = f.read()
+                            if stderr_content:
+                                error_msg += f"\nServer stderr:\n{stderr_content[:500]}"
+                    except Exception:
+                        pass
+
+                print(f"❌ {error_msg}")
+                raise RuntimeError(error_msg)
 
             yield
+
         finally:
-            # Cleanup
+            # Cleanup server process
             if server_process:
+                print("\n🛑 Terminating API server...")
                 server_process.terminate()
                 try:
                     server_process.wait(timeout=5)
+                    print("✅ Server terminated gracefully")
                 except subprocess.TimeoutExpired:
+                    print("⚠️  Server did not terminate, killing...")
                     server_process.kill()
+                    server_process.wait()
+
+    finally:
+        # Close log files
+        if server_log_stdout:
+            server_log_stdout.close()
+        if server_log_stderr:
+            server_log_stderr.close()
 
 
 class TestAPIEndpoints:

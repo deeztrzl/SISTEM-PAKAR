@@ -5,18 +5,20 @@
 Flask>=2.0.0
 Flask-CORS>=3.0.0
 
+# HTTP Requests (required for API tests and Docker health checks)
+requests>=2.25.0
+
+# Testing & Development Dependencies
+pytest>=6.0.0
+pytest-cov>=2.12.0
+pylint>=2.0.0
+black>=21.0.0
+flake8>=3.9.0
+
 # Built-in libraries yang digunakan:
 # - tkinter (untuk GUI - optional)
-# - json (untuk parsing rules.json)  
+# - json (untuk parsing rules.json)
 # - os (untuk file operations)
 # - sys (untuk system operations)
 # - copy (untuk deep copying)
 # - typing (untuk type hints)
-
-# Installation:
-# pip install Flask Flask-CORS
-
-# Untuk development dan testing (optional):
-# pytest>=6.0.0
-# pylint>=2.0.0
-# black>=21.0.0

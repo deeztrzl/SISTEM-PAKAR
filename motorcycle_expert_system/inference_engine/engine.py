@@ -3,7 +3,7 @@ import os
 
 
 class InferenceEngine:
-    de __init__(self):
+    def __init__(self):
         self.rules = []
         self.symptoms = {}
         self.damages = {}

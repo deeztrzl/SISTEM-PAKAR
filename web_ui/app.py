@@ -162,7 +162,7 @@ def api_diagnose():  # noqa: C901
         for symptom, value in symptoms.items():
             try:
                 # Handle nested format: {symptom: {present: bool, cf: value}}
-                i isinstance(value, dict) and "cf" in value:
+                if isinstance(value, dict) and "cf" in value:
                     cf_float = float(value["cf"])
                 # Handle flat format: {symptom: cf_value}
                 ele:

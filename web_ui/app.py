@@ -165,7 +165,7 @@ def api_diagnose():  # noqa: C901
                 if isinstance(value, dict) and "cf" in value:
                     cf_float = float(value["cf"])
                 # Handle flat format: {symptom: cf_value}
-                ele:
+                else:
                     cf_float = float(value)
 
                 if not (0.1 <= cf_float <= 1.0):

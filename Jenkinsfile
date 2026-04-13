@@ -23,8 +23,7 @@ pipeline {
         stage('Knowledge Base Integrity Check') {
             steps {
                 // Fakta: Satu tanda kutip yang hilang pada JSON akan merusak aplikasi Flask. 
-                // Tahap ini memvalidasi seluruh berkas JSON sebelum diproses lebih lanjut.
-                # Validasi spesifik pada file yang relevan saja
+                // Tahap ini memvalidasi seluruh berkas JSON sebelum diproses lebih validasi spesifik pada file yang relevan saja
                 echo "Memvalidasi sintaks JSON..."
                 python3 -m json.tool "./rules.json" > /dev/null || exit 1
                 echo "Integritas JSON Knowledge Base terverifikasi."

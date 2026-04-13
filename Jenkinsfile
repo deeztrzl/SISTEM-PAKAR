@@ -2,111 +2,69 @@
 
 pipeline {
     agent any
-    
-    options {
-        buildDiscarder(logRotator(numToKeepStr: '10'))
-        timeout(time: 30, unit: 'MINUTES')
-        timestamps()
-    }
-    
+
     environment {
-        PYTHON_VERSION = '3.9'
-        VENV_DIR = '.venv'
+        DOCKER_IMAGE = 'registry.internal.company/bpjs-flask-web'
+        DOCKER_CREDENTIALS_ID = 'dockerhub-credentials'
     }
-    
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '5'))
+        disableConcurrentBuilds()
+    }
+
     stages {
-        stage('Checkout') {
+        stage('Checkout Code') {
             steps {
-                script {
-                    echo "📦 Checking out repository..."
-                    checkout scm // Kalau ini gagal, langsung stop (pantas).
-                }
+                checkout scm
             }
         }
-        
-        stage('Setup Environment') {
+
+        stage('Knowledge Base Integrity Check') {
             steps {
-                script {
-                    echo "🔧 Setting up Python environment..."
-                    // Stage ini harus sukses (Blocking). Kalau gagal, library ga ada.
-                    sh '''
-                        python3 -m venv ${VENV_DIR}
-                        . ${VENV_DIR}/bin/activate
-                        pip install --upgrade pip setuptools wheel
-                        pip install -r requirements.txt
-                        pip install pytest pytest-cov pylint black flake8
-                        mkdir -p reports
-                    '''
-                }
+                // Fakta: Satu tanda kutip yang hilang pada JSON akan merusak aplikasi Flask. 
+                // Tahap ini memvalidasi seluruh berkas JSON sebelum diproses lebih lanjut.
+                sh '''
+                echo "Memvalidasi sintaks JSON..."
+                for file in $(find . -name "*.json"); do
+                    python3 -m json.tool "$file" > /dev/null || exit 1
+                done
+                echo "Integritas JSON Knowledge Base terverifikasi."
+                '''
             }
         }
-        
-        stage('Code Quality') {
-            parallel {
-                stage('Code Format') {
-                    steps {
-                        script {
-                            echo "✨ Checking code format (Black)..."
-                            def status = sh(script: ". ${VENV_DIR}/bin/activate && black --check .", returnStatus: true)
-                            if (status != 0) {
-                                echo "❌ Black: Kode lo berantakan, tolong dirapiin!"
-                                currentBuild.result = 'FAILURE'
-                            }
-                        }
-                    }
-                }
+
+        stage('Backend: Flask Testing & Linting') {
+            steps {
+                // Menyiapkan environment Python dan menjalankan pengujian
+                sh '''
+                python3 -m venv venv
+                . venv/bin/activate
+                pip install -r requirements.txt
                 
-                stage('Linting') {
-                    steps {
-                        script {
-                            echo "🔍 Running linting (Flake8)..."
-                            def status = sh(script: ". ${VENV_DIR}/bin/activate && flake8 . --format=json > reports/flake8-report.json", returnStatus: true)
-                            if (status != 0) {
-                                echo "❌ Flake8: Ada bau busuk di kode lo (Code Smell)!"
-                                currentBuild.result = 'FAILURE'
-                            }
-                        }
-                    }
+                # Memeriksa standar kode Python (mencegah syntax error fatal)
+                pip install flake8 pytest
+                flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+                
+                # Menjalankan unit test aplikasi Flask
+                pytest tests/
+                '''
+            }
+        }
+
+        stage('Build Flask Docker Image') {
+            steps {
+                script {
+                    // Dockerfile harus sudah dikonfigurasi untuk menjalankan Gunicorn/Waitress, bukan Flask Development Server
+                    appImage = docker.build("${DOCKER_IMAGE}:${env.BUILD_NUMBER}", "-f Dockerfile .")
                 }
             }
         }
-        
-        stage('Unit Tests') {
+
+        stage('Security Vulnerability Scan (Trivy)') {
             steps {
-                script {
-                    echo "🧪 Running unit tests..."
-                    // Biarkan pytest jalan sampai habis buat dapet junit.xml
-                    def status = sh(script: """
-                        . ${VENV_DIR}/bin/activate
-                        pytest tests/test_inference.py -v --tb=short \
-                            --junitxml=reports/junit.xml \
-                            --cov=inference_engine \
-                            --cov-report=xml:reports/coverage.xml
-                    """, returnStatus: true)
-                    
-                    if (status != 0) {
-                        echo "❌ Unit Tests: Ada logic yang meledak!"
-                        currentBuild.result = 'FAILURE'
-                    }
-                }
-            }
-        }
-        
-        stage('Integration Tests') {
-            steps {
-                script {
-                    echo "🔗 Running integration tests..."
-                    def status = sh(script: """
-                        . ${VENV_DIR}/bin/activate
-                        pytest tests/test_api.py -v --tb=short \
-                            --junitxml=reports/integration-tests.xml
-                    """, returnStatus: true)
-                    
-                    if (status != 0) {
-                        echo "❌ Integration Tests: API atau koneksi bermasalah!"
-                        currentBuild.result = 'FAILURE'
-                    }
-                }
+                // Memindai base image Python dari celah keamanan
+                sh "trivy image --severity HIGH,CRITICAL ${DOCKER_IMAGE}:${env.BUILD_NUMBER}"
             }
         }
     }

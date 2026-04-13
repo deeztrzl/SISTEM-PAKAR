@@ -62,10 +62,26 @@ pipeline {
                     steps {
                         script {
                             echo "🔍 Running linting (Flake8)..."
-                            sh '''
-                                . ${VENV_DIR}/bin/activate
-                                flake8 . --format=json > reports/flake8-report.json || true
-                            '''
+                            
+                            // Simpan status exit code tanpa mematikan stage
+                            def status = sh(
+                                script: """
+                                    . ${VENV_DIR}/bin/activate
+                                    flake8 . --format=json > reports/flake8-report.json
+                                """,
+                                returnStatus: true
+                            )
+
+                            // Cek apakah ada error
+                            if (status != 0) {
+                                echo "❌ Flake8 nemu dosa di kode lo!"
+                                // Kita set hasil build jadi FAILURE tapi stage ini kelar dulu
+                                currentBuild.result = 'FAILURE'
+                            } else {
+                                echo "✅ Kode bersih, mantap!"
+                            }
+                            
+                            // Di sini lo bisa lanjutin bikin payload n8n pake file flake8-report.json
                         }
                     }
                 }

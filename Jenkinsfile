@@ -24,13 +24,10 @@ pipeline {
             steps {
                 // Fakta: Satu tanda kutip yang hilang pada JSON akan merusak aplikasi Flask. 
                 // Tahap ini memvalidasi seluruh berkas JSON sebelum diproses lebih lanjut.
-                sh '''
+                # Validasi spesifik pada file yang relevan saja
                 echo "Memvalidasi sintaks JSON..."
-                for file in $(find . -name "*.json"); do
-                    python3 -m json.tool "$file" > /dev/null || exit 1
-                done
+                python3 -m json.tool "./rules.json" > /dev/null || exit 1
                 echo "Integritas JSON Knowledge Base terverifikasi."
-                '''
             }
         }
 

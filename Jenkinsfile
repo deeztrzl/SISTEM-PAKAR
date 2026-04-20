@@ -39,14 +39,17 @@ pipeline {
         
         stage('SonarQube Security Scan') {
             steps {
-                // GERBANG MUTLAK: Wajib pakai blok script untuk mendefinisikan variabel (def)
                 script {
-                    // Pastikan 'SonarScanner' adalah nama yang persis ada di Manage Jenkins -> Tools
                     def scannerHome = tool 'SonarScanner'
                     
-                    // GERBANG MUTLAK: Wajib isi parameter nama server (contoh: 'sonar-server')
+                    // FAKTA: Blok ini yang otomatis menyuntikkan URL Docker (sonarqube:9000)
+                    // dan Token rahasia tanpa membocorkannya ke dalam kode teks.
                     withSonarQubeEnv('sonar-server') {
-                        sh "${scannerHome}/bin/sonar-scanner"
+                        sh """
+                            ${scannerHome}/bin/sonar-scanner \
+                            -Dsonar.projectKey=jenkins-test \
+                            -Dsonar.sources=.
+                        """
                     }
                 }
             }

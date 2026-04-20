@@ -37,11 +37,17 @@ pipeline {
             }
         }
         
-        stage('SonarQube Analysis') {
+        stage('SonarQube Security Scan') {
             steps {
-                def scannerHome = tool 'SonarScanner';
-                withSonarQubeEnv() {
-                    sh "${scannerHome}/bin/sonar-scanner"
+                // GERBANG MUTLAK: Wajib pakai blok script untuk mendefinisikan variabel (def)
+                script {
+                    // Pastikan 'SonarScanner' adalah nama yang persis ada di Manage Jenkins -> Tools
+                    def scannerHome = tool 'SonarScanner'
+                    
+                    // GERBANG MUTLAK: Wajib isi parameter nama server (contoh: 'sonar-server')
+                    withSonarQubeEnv('sonar-server') {
+                        sh "${scannerHome}/bin/sonar-scanner"
+                    }
                 }
             }
         }

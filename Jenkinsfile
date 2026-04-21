@@ -47,8 +47,9 @@ pipeline {
                     withSonarQubeEnv('SonarQube-Server') {
                         sh """
                             ${scannerHome}/bin/sonar-scanner \
-                            -Dsonar.projectKey=jenkins-test \
-                            -Dsonar.sources=.
+                            -Dsonar.projectKey=MyProjectKey \
+                            -Dsonar.sources=. \
+                            -Dsonar.host.url=http://host.docker.internal:9000/"
                         """
                     }
                 }

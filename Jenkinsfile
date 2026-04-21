@@ -49,7 +49,7 @@ pipeline {
                             ${scannerHome}/bin/sonar-scanner \
                             -Dsonar.projectKey=MyProjectKey \
                             -Dsonar.sources=. \
-                            -Dsonar.host.url=http://host.docker.internal:9000/"
+                            -Dsonar.host.url=http://host.docker.internal:9000/
                         """
                     }
                 }

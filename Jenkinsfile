@@ -39,16 +39,19 @@ pipeline {
         
         stage('SonarQube analysis') {
             steps {
-                script {
-                    // 1. Panggil tool berdasarkan 'Name' yang Anda buat di UI
-                    def scannerHome = tool 'SonarScanner'
-                    
-                    // 2. Bungkus dengan environment server (Nama server harus sesuai di System Config)
-                    withSonarQubeEnv('sonar-server') { 
-                        sh "${scannerHome}/bin/sonar-scanner \
-                        -Dsonar.projectKey=jenkins-test\
+                // Pastikan 'sonar-token-id' adalah ID yang Anda buat di Manage Jenkins > Credentials
+                withCredentials([string(credentialsId: 'sonarqube-token-id', variable: 'AUTH_TOKEN')]) {
+                    script {
+                        def scannerHome = tool 'SonarScanner'
+                        
+                        sh """
+                        ${scannerHome}/bin/sonar-scanner \
+                        -Dsonar.projectKey=jenkins-test \
                         -Dsonar.sources=. \
-                        -Dsonar.host.url=http://sonarqube:9000"
+                        -Dsonar.host.url=http://sonarqube:9000 \
+                        -Dsonar.token=${AUTH_TOKEN} \
+                        -Dsonar.login=${AUTH_TOKEN}
+                        """
                     }
                 }
             }

@@ -39,8 +39,17 @@ pipeline {
         
         stage('SonarQube analysis') {
             steps {
-                withCredentials([string(credentialsId: 'sonarqube-token-id', variable: 'SONAR_TOKEN')]) {
-                    sh 'sonar-scanner -Dsonar.host.url=http://sonarqube:9000'
+                script {
+                    // 1. Panggil tool berdasarkan 'Name' yang Anda buat di UI
+                    def scannerHome = tool 'SonarScanner'
+                    
+                    // 2. Bungkus dengan environment server (Nama server harus sesuai di System Config)
+                    withSonarQubeEnv('SonarQube-Server') { 
+                        sh "${scannerHome}/bin/sonar-scanner \
+                        -Dsonar.projectKey=SISTEM-PAKAR \
+                        -Dsonar.sources=. \
+                        -Dsonar.host.url=http://sonarqube:9000"
+                    }
                 }
             }
         }

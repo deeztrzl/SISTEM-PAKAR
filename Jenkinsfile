@@ -48,7 +48,7 @@ pipeline {
                         sh "${scannerHome}/bin/sonar-scanner \
                         -Dsonar.projectKey=jenkins-test\
                         -Dsonar.sources=. \
-                        -Dsonar.host.url=http://sonarqube:9000"
+                        -Dsonar.host.url=http://sonarqube:9001"
                     }
                 }
             }

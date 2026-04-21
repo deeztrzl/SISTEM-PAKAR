@@ -44,7 +44,7 @@ pipeline {
                     def scannerHome = tool 'SonarScanner'
                     
                     // 2. Bungkus dengan environment server (Nama server harus sesuai di System Config)
-                    withSonarQubeEnv('SonarQube-Server') { 
+                    withSonarQubeEnv('sonar-server') { 
                         sh "${scannerHome}/bin/sonar-scanner \
                         -Dsonar.projectKey=SISTEM-PAKAR \
                         -Dsonar.sources=. \

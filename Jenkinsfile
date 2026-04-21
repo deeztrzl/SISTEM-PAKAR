@@ -46,7 +46,7 @@ pipeline {
                     // 2. Bungkus dengan environment server (Nama server harus sesuai di System Config)
                     withSonarQubeEnv('sonar-server') { 
                         sh "${scannerHome}/bin/sonar-scanner \
-                        -Dsonar.projectKey=SISTEM-PAKAR \
+                        -Dsonar.projectKey=jenkins-test\
                         -Dsonar.sources=. \
                         -Dsonar.host.url=http://sonarqube:9000"
                     }

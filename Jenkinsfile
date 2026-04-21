@@ -1,12 +1,7 @@
 @Library('my-local-lib') _
 
 pipeline {
-    agent {
-        docker { 
-            image 'python:3.11-slim' 
-            args  '-u root' // Agar punya akses tulis folder
-        }
-    }
+    agent any
 
     options {
         buildDiscarder(logRotator(numToKeepStr: '10'))

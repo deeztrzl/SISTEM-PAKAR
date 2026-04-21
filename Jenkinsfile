@@ -48,7 +48,7 @@ pipeline {
                         ${scannerHome}/bin/sonar-scanner \
                         -Dsonar.projectKey=jenkins-test \
                         -Dsonar.sources=. \
-                        -Dsonar.host.url=http://sonarqube_app:9000 \
+                        -Dsonar.host.url=http://sonarqube:9000 \
                         -Dsonar.token=${AUTH_TOKEN} \
                         -Dsonar.login=${AUTH_TOKEN}
                         """

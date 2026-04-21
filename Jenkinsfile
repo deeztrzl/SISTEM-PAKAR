@@ -40,21 +40,16 @@ pipeline {
         stage('SonarQube Security Scan') {
             steps {
                 script {
-                    // Pastikan 'SonarScanner' sudah terdaftar di Global Tool Configuration
                     def scannerHome = tool 'SonarScanner'
                     
-                    // Kita ambil token secara eksplisit dari Jenkins Credentials Store
-                    // Ganti 'sonar-token' dengan ID Credential yang kamu buat di Jenkins
-                    withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_AUTH_TOKEN')]) {
-                        withSonarQubeEnv('sonar-server') {
-                            sh """
-                                ${scannerHome}/bin/sonar-scanner \
-                                -Dsonar.projectKey=jenkins-test \
-                                -Dsonar.sources=. \
-                                -Dsonar.host.url=http://sonarqube:9000 \
-                                -Dsonar.login=${SONAR_AUTH_TOKEN}
-                            """
-                        }
+                    // FAKTA: Blok ini yang otomatis menyuntikkan URL Docker (sonarqube:9000)
+                    // dan Token rahasia tanpa membocorkannya ke dalam kode teks.
+                    withSonarQubeEnv('sonar-server') {
+                        sh """
+                            ${scannerHome}/bin/sonar-scanner \
+                            -Dsonar.projectKey=jenkins-test \
+                            -Dsonar.sources=.
+                        """
                     }
                 }
             }

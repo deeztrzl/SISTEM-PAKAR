@@ -40,16 +40,15 @@ pipeline {
         stage('SonarQube Security Scan') {
             steps {
                 script {
-                    def scannerHome = tool 'sonar-scanner'
+                    def scannerHome = tool 'SonarScanner'
                     
                     // FAKTA: Blok ini yang otomatis menyuntikkan URL Docker (sonarqube:9000)
                     // dan Token rahasia tanpa membocorkannya ke dalam kode teks.
-                    withSonarQubeEnv('SonarQube-Server') {
+                    withSonarQubeEnv('sonar-server') {
                         sh """
                             ${scannerHome}/bin/sonar-scanner \
-                            -Dsonar.projectKey=MyProjectKey \
-                            -Dsonar.sources=. \
-                            -Dsonar.host.url=http://host.docker.internal:9000/
+                            -Dsonar.projectKey=jenkins-test \
+                            -Dsonar.sources=.
                         """
                     }
                 }

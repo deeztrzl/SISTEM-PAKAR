@@ -50,7 +50,7 @@ pipeline {
                             // Fallback logic jika user null
                             def user = env.BUILD_USER_ID ?: "System/SCM"
         
-                            withSonarQubeEnv('SonarQube') {
+                            withSonarQubeEnv('sonar-server') {
                                 // Gunakan path absolut dari scannerHome
                                 sh """
                                 ${scannerHome}/bin/sonar-scanner \

@@ -42,20 +42,23 @@ pipeline {
                 // Pastikan 'sonar-token-id' adalah ID yang Anda buat di Manage Jenkins > Credentials
                 withCredentials([string(credentialsId: 'sonarqube-token-id', variable: 'AUTH_TOKEN')]) {
                     script {
-                        def scannerHome = tool 'SonarScanner'
-                        
-                        sh """
-                        ${scannerHome}/bin/sonar-scanner \
-                        -Dsonar.projectKey=jenkins-test \
-                        -Dsonar.sources=. \
-                        -Dsonar.host.url=http://sonarqube:9000 \
-                        -Dsonar.token=${AUTH_TOKEN} \
-                        -Dsonar.login=${AUTH_TOKEN} \
-                        -Dsonar.analysis.buildUser=${BUILD_USER_ID} \
-                        -Dsonar.analysis.buildNumber=${BUILD_ID}
-                        """
-                    }
+                // Sekarang BUILD_USER_ID sudah tersedia di dalam blok ini
+                def user = env.BUILD_USER_ID ?: "System/SCM"
+                def scannerHome = tool 'SonarScanner'
+                
+                withSonarQubeEnv('SonarQube') {
+                    sh """
+                    sonar-scanner \
+                    -Dsonar.projectKey=jenkins-test \
+                    -Dsonar.sources=. \
+                    -Dsonar.host.url=http://sonarqube:9000 \
+                    -Dsonar.token=${AUTH_TOKEN} \
+                    - Dsonar.login=${AUTH_TOKEN} \
+                    -Dsonar.analysis.buildUser=${user}
+                    """
                 }
+            }
+        }
             }
         }
 

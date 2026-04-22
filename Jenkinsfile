@@ -50,7 +50,9 @@ pipeline {
                         -Dsonar.sources=. \
                         -Dsonar.host.url=http://sonarqube:9000 \
                         -Dsonar.token=${AUTH_TOKEN} \
-                        -Dsonar.login=${AUTH_TOKEN}
+                        -Dsonar.login=${AUTH_TOKEN} \
+                        -Dsonar.analysis.buildUser=${BUILD_USER_ID} \
+                        -Dsonar.analysis.buildNumber=${BUILD_ID}
                         """
                     }
                 }

@@ -1,3 +1,5 @@
+import groovy.json.JsonOutput
+
 @Library('my-local-lib') _
 
 pipeline {
@@ -12,6 +14,12 @@ pipeline {
     environment {
         PYTHON_VERSION = '3.9'
         VENV_DIR = '.venv'
+        
+        // Hostname menggunakan nama container n8n di docker network
+        N8N_BURP_WEBHOOK    = 'http://n8n:5678/webhook/29618a6e-webhook-burpsuite'
+        N8N_SONAR_WEBHOOK   = 'http://n8n:5678/webhook/sonarqube-trigger'
+        // Tambahkan webhook khusus untuk error reporting
+        N8N_FAILURE_WEBHOOK = 'http://n8n:5678/webhook/pipeline-failure' 
     }
 
     stages {
@@ -39,19 +47,13 @@ pipeline {
         
         stage('SonarQube analysis') {
             steps {
-                // 1. Ambil Credentials
                 withCredentials([string(credentialsId: 'sonarqube-token-id', variable: 'AUTH_TOKEN')]) {
-                    // 2. Bungkus agar BUILD_USER_ID tersedia
                     wrap([$class: 'BuildUser']) {
                         script {
-                            // Ambil path scanner yang dikonfigurasi di Manage Jenkins > Global Tool Configuration
                             def scannerHome = tool 'SonarScanner'
-                            
-                            // Fallback logic jika user null
                             def user = env.BUILD_USER_ID ?: "System/SCM"
         
                             withSonarQubeEnv('sonar-server') {
-                                // Gunakan path absolut dari scannerHome
                                 sh """
                                 ${scannerHome}/bin/sonar-scanner \
                                 -Dsonar.projectKey=jenkins-test \
@@ -137,6 +139,30 @@ pipeline {
                 }
             }
         }
+
+        stage('Trigger Downstream Webhooks') {
+            steps {
+                script {
+                    echo "🚀 Firing downstream success webhooks to n8n..."
+                    parallel(
+                        "BurpSuite Trigger": {
+                            sh """
+                            curl -X POST -sS --fail --max-time 10 ${N8N_BURP_WEBHOOK} \
+                                 -H "Content-Type: application/json" \
+                                 -d '{"build_number": "${env.BUILD_NUMBER}", "project": "jenkins-test", "action": "trigger_dast"}'
+                            """
+                        },
+                        "SonarQube Trigger": {
+                            sh """
+                            curl -X POST -sS --fail --max-time 10 ${N8N_SONAR_WEBHOOK} \
+                                 -H "Content-Type: application/json" \
+                                 -d '{"build_number": "${env.BUILD_NUMBER}", "project": "jenkins-test", "action": "process_sonar"}'
+                            """
+                        }
+                    )
+                }
+            }
+        }
     }
 
     post {
@@ -146,14 +172,41 @@ pipeline {
         }
         failure {
             script {
-                echo "❌ Pipeline failed! Notifying n8n..."
-                notifyN8N()
+                echo "❌ Pipeline failed! Compiling logs and notifying n8n..."
+                
+                def jobName = env.JOB_NAME
+                def buildId = env.BUILD_ID
+                def buildUrl = env.BUILD_URL
+                
+                // Ambil 1500 baris terakhir, pastikan di Jenkins in-process script approval sudah di-allow
+                def logLines = currentBuild.rawBuild.getLog(1500)
+                def logCount = logLines.size()
+                def start = logCount > 800 ? logCount - 800 : 0
+                def combinedLog = logLines.subList(start, logCount).join('\n')
+                
+                def payloadData = [
+                    "status": "failed",
+                    "job_name": jobName,
+                    "build_id": buildId,
+                    "url": buildUrl,
+                    "pipeline_log": combinedLog
+                ]
+                
+                def jsonString = JsonOutput.toJson(payloadData)
+                writeFile file: 'n8n_payload.json', text: jsonString
+
+                // Kirim payload dengan argument -d @filename untuk membaca file JSON
+                sh """
+                curl -X POST -sS --max-time 15 ${N8N_FAILURE_WEBHOOK} \
+                     -H "Content-Type: application/json" \
+                     -d @n8n_payload.json
+                """
             }
         }
         unstable {
             script {
-                echo "⚠️ Pipeline is unstable. Notifying n8n..."
-                notifyN8N()
+                echo "⚠️ Pipeline is unstable. Check SonarQube or formatting logs."
+                // Implementasi webhook unstable dapat ditambahkan di sini jika dibutuhkan
             }
         }
     }

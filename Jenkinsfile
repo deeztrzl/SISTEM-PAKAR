@@ -16,8 +16,8 @@ pipeline {
         VENV_DIR = '.venv'
         
         // Hostname menggunakan nama container n8n di docker network
-        N8N_BURP_WEBHOOK    = 'http://n8n:5678/webhook/29618a6e-webhook-burpsuite'
-        N8N_SONAR_WEBHOOK   = 'http://n8n:5678/webhook/sonarqube-trigger'
+        N8N_BURP_WEBHOOK    = 'http://n8n_app:5678/webhook/29618a6e-webhook-burpsuite'
+        N8N_SONAR_WEBHOOK   = 'http://n8n_app:5678/webhook/sonarqube-trigger'
         // Tambahkan webhook khusus untuk error reporting
         N8N_FAILURE_WEBHOOK = 'http://n8n:5678/webhook/pipeline-failure' 
     }

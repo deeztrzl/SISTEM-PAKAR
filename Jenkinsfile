@@ -9,14 +9,13 @@ pipeline {
         buildDiscarder(logRotator(numToKeepStr: '10'))
         timeout(time: 30, unit: 'MINUTES')
         timestamps()
-        disableConcurrentBuilds() // Praktik enterprise untuk menghindari bentrok state
+        disableConcurrentBuilds() // Praktik enterprise untuk menghindari benturan state antar build
     }
 
     environment {
         PYTHON_VERSION = '3.9'
         VENV_DIR = '.venv'
         
-        // Praktik terbaik: Pindahkan URL ini ke Global/Folder properties jika memungkinkan
         N8N_BURP_WEBHOOK    = 'http://n8n_app:5678/webhook/29618a6e-webhook-burpsuite'
         N8N_SONAR_WEBHOOK   = 'http://n8n_app:5678/webhook/sonarqube-trigger'
         N8N_FAILURE_WEBHOOK = 'http://n8n:5678/webhook/pipeline-failure' 
@@ -32,7 +31,7 @@ pipeline {
 
         stage('Setup Environment') {
             steps {
-                // Eksekusi shell statis dengan single quotes
+                // Mengeksekusi binary Python langsung dari venv, tanpa state activation yang rentan error di Jenkins
                 sh '''
                     python3 -m venv .venv
                     .venv/bin/python -m pip install --upgrade pip setuptools wheel
@@ -48,13 +47,11 @@ pipeline {
                 wrap([$class: 'BuildUser']) {
                     script {
                         def scannerHome = tool 'SonarScanner'
-                        def user = env.BUILD_USER_ID ?: "System"
                         
-                        // Injeksi scannerHome ke PATH environment agar tidak perlu interpolasi Groovy di dalam sh
+                        // Menambah PATH agar pemanggilan shell lebih ringkas dan meminimalisasi interpolasi
                         withEnv(["PATH+SONAR=${scannerHome}/bin"]) {
                             withSonarQubeEnv('sonar-server') {
-                                // Eksekusi 100% aman: menggunakan single quotes ('), tidak ada variabel Groovy yang terekspos.
-                                // URL dan Token diurus sepenuhnya oleh plugin withSonarQubeEnv.
+                                // Eksekusi dengan single quotes murni tanpa eksposur variabel rahasia ke Groovy
                                 sh '''
                                     sonar-scanner \
                                     -Dsonar.projectKey=jenkins-test \
@@ -73,7 +70,6 @@ pipeline {
                     steps {
                         echo "✨ Checking code format (Black)..."
                         script {
-                            // Pemanggilan langsung ke binary venv tanpa activate
                             def status = sh(script: ".venv/bin/black --check .", returnStatus: true)
                             if (status != 0) {
                                 currentBuild.result = 'UNSTABLE'
@@ -122,25 +118,28 @@ pipeline {
         }
 
         stage('Trigger Downstream Webhooks') {
-            steps {
-                echo "🚀 Firing downstream success webhooks to n8n..."
-                parallel(
-                    "BurpSuite Trigger": {
-                        // Interpolasi shell standar
+            // Struktur deklaratif murni: parallel hanya membungkus sub-stage
+            parallel {
+                stage('BurpSuite Trigger') {
+                    steps {
+                        echo "🚀 Firing BurpSuite webhook to n8n..."
                         sh """
                             curl -X POST -sS --fail --max-time 10 ${N8N_BURP_WEBHOOK} \
                                  -H "Content-Type: application/json" \
                                  -d '{"build_number": "${BUILD_NUMBER}", "project": "jenkins-test", "action": "trigger_dast"}'
                         """
-                    },
-                    "SonarQube Trigger": {
+                    }
+                }
+                stage('SonarQube Trigger') {
+                    steps {
+                        echo "🚀 Firing SonarQube webhook to n8n..."
                         sh """
                             curl -X POST -sS --fail --max-time 10 ${N8N_SONAR_WEBHOOK} \
                                  -H "Content-Type: application/json" \
                                  -d '{"build_number": "${BUILD_NUMBER}", "project": "jenkins-test", "action": "process_sonar"}'
                         """
                     }
-                )
+                }
             }
         }
     }
@@ -154,8 +153,7 @@ pipeline {
             script {
                 echo "❌ Pipeline failed! Notifying n8n to fetch logs..."
                 
-                // Arsitektur yang benar: Kirim metadata, biarkan n8n memanggil Jenkins REST API
-                // n8n harus melakukan GET ke ${BUILD_URL}/consoleText menggunakan Jenkins API Token
+                // Praktik enterprise: Delegasikan penarikan log ke sistem eksternal menggunakan API Jenkins
                 def payloadData = [
                     "status": "failed",
                     "job_name": env.JOB_NAME,

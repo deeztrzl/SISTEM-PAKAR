@@ -21,10 +21,20 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
+        stage('Checkout & Initialization') {
             steps {
-                echo "📦 Checking out repository..."
+                echo "📦 Checking out repository & Initializing variables..."
                 checkout scm
+                
+                // Menangkap identitas user secara global untuk seluruh pipeline
+                wrap([$class: 'BuildUser']) {
+                    script {
+                        // Menggunakan Elvis operator (?:) sebagai fallback esensial 
+                        // jika pipeline dipicu secara otomatis (SCM/Timer)
+                        env.TRIGGER_USER = env.BUILD_USER_ID ?: "System/Automated"
+                        echo "🧑‍💻 Build triggered by: ${env.TRIGGER_USER}"
+                    }
+                }
             }
         }
 
@@ -42,18 +52,18 @@ pipeline {
         
         stage('SonarQube Analysis') {
             steps {
-                wrap([$class: 'BuildUser']) {
-                    script {
-                        def scannerHome = tool 'SonarScanner'
-                        
-                        withEnv(["PATH+SONAR=${scannerHome}/bin"]) {
-                            withSonarQubeEnv('sonar-server') {
-                                sh '''
-                                    sonar-scanner \
-                                    -Dsonar.projectKey=jenkins-test \
-                                    -Dsonar.sources=.
-                                '''
-                            }
+                script {
+                    def scannerHome = tool 'SonarScanner'
+                    
+                    withEnv(["PATH+SONAR=${scannerHome}/bin"]) {
+                        withSonarQubeEnv('sonar-server') {
+                            // Menggunakan variabel global TRIGGER_USER yang sudah ditangkap di awal
+                            sh """
+                                sonar-scanner \
+                                -Dsonar.projectKey=jenkins-test \
+                                -Dsonar.sources=. \
+                                -Dsonar.analysis.buildUser=${TRIGGER_USER}
+                            """
                         }
                     }
                 }
@@ -118,20 +128,22 @@ pipeline {
                 stage('BurpSuite Trigger') {
                     steps {
                         echo "🚀 Firing BurpSuite webhook to n8n..."
+                        // Menambahkan triggered_by ke dalam payload JSON
                         sh """
                             curl -X POST -sS --fail --max-time 10 ${N8N_BURP_WEBHOOK} \
                                  -H "Content-Type: application/json" \
-                                 -d '{"build_number": "${BUILD_NUMBER}", "project": "jenkins-test", "action": "trigger_dast"}'
+                                 -d '{"build_number": "${BUILD_NUMBER}", "project": "jenkins-test", "action": "trigger_dast", "triggered_by": "${TRIGGER_USER}"}'
                         """
                     }
                 }
                 stage('SonarQube Trigger') {
                     steps {
                         echo "🚀 Firing SonarQube webhook to n8n..."
+                        // Menambahkan triggered_by ke dalam payload JSON
                         sh """
                             curl -X POST -sS --fail --max-time 10 ${N8N_SONAR_WEBHOOK} \
                                  -H "Content-Type: application/json" \
-                                 -d '{"build_number": "${BUILD_NUMBER}", "project": "jenkins-test", "action": "process_sonar"}'
+                                 -d '{"build_number": "${BUILD_NUMBER}", "project": "jenkins-test", "action": "process_sonar", "triggered_by": "${TRIGGER_USER}"}'
                         """
                     }
                 }

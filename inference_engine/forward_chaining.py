@@ -13,7 +13,7 @@ class InferenceEngine:
     - Tracking aturan yang digunakan
     """
 
-    d __init__(self, rules_file: str):
+    def __init__(self, rules_file: str):
         """
         Inisialisasi inference engine dengan memuat rules dari file JSON
 

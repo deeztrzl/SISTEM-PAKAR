@@ -9,7 +9,7 @@ pipeline {
         buildDiscarder(logRotator(numToKeepStr: '10'))
         timeout(time: 30, unit: 'MINUTES')
         timestamps()
-        disableConcurrentBuilds() // Praktik enterprise untuk menghindari benturan state antar build
+        disableConcurrentBuilds()
     }
 
     environment {
@@ -18,7 +18,6 @@ pipeline {
         
         N8N_BURP_WEBHOOK    = 'http://n8n_app:5678/webhook/29618a6e-webhook-burpsuite'
         N8N_SONAR_WEBHOOK   = 'http://n8n_app:5678/webhook/sonarqube-trigger'
-        N8N_FAILURE_WEBHOOK = 'http://n8n:5678/webhook/pipeline-failure' 
     }
 
     stages {
@@ -31,7 +30,6 @@ pipeline {
 
         stage('Setup Environment') {
             steps {
-                // Mengeksekusi binary Python langsung dari venv, tanpa state activation yang rentan error di Jenkins
                 sh '''
                     python3 -m venv .venv
                     .venv/bin/python -m pip install --upgrade pip setuptools wheel
@@ -48,10 +46,8 @@ pipeline {
                     script {
                         def scannerHome = tool 'SonarScanner'
                         
-                        // Menambah PATH agar pemanggilan shell lebih ringkas dan meminimalisasi interpolasi
                         withEnv(["PATH+SONAR=${scannerHome}/bin"]) {
                             withSonarQubeEnv('sonar-server') {
-                                // Eksekusi dengan single quotes murni tanpa eksposur variabel rahasia ke Groovy
                                 sh '''
                                     sonar-scanner \
                                     -Dsonar.projectKey=jenkins-test \
@@ -118,7 +114,6 @@ pipeline {
         }
 
         stage('Trigger Downstream Webhooks') {
-            // Struktur deklaratif murni: parallel hanya membungkus sub-stage
             parallel {
                 stage('BurpSuite Trigger') {
                     steps {
@@ -148,28 +143,6 @@ pipeline {
         always {
             junit testResults: 'reports/*.xml', allowEmptyResults: true
             archiveArtifacts artifacts: 'reports/**', allowEmptyArchive: true
-        }
-        failure {
-            script {
-                echo "❌ Pipeline failed! Notifying n8n to fetch logs..."
-                
-                // Praktik enterprise: Delegasikan penarikan log ke sistem eksternal menggunakan API Jenkins
-                def payloadData = [
-                    "status": "failed",
-                    "job_name": env.JOB_NAME,
-                    "build_id": env.BUILD_ID,
-                    "url": env.BUILD_URL,
-                    "log_api_url": "${env.BUILD_URL}consoleText"
-                ]
-                
-                writeFile file: 'n8n_payload.json', text: JsonOutput.toJson(payloadData)
-
-                sh """
-                    curl -X POST -sS --max-time 15 ${N8N_FAILURE_WEBHOOK} \
-                         -H "Content-Type: application/json" \
-                         -d @n8n_payload.json
-                """
-            }
         }
         unstable {
             echo "⚠️ Pipeline is unstable. Check SonarQube or formatting logs."
